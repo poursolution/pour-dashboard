@@ -572,15 +572,16 @@ table.bid tbody td:last-child{border-right:none}
       <div class="bid-scroll">
         <table class="bid">
           <colgroup>
-            <col style="width:100px"><col style="width:90px"><col style="width:170px">
+            <col style="width:80px"><col style="width:90px"><col style="width:90px"><col style="width:170px">
             <col style="width:160px"><col style="width:150px">
             <col style="width:110px"><col style="width:90px">
           </colgroup>
           <thead>
             <tr class="bh1">
-              <th colspan="7" style="border-right:none;letter-spacing:6px;font-size:14px">공 고 문 대 시 보 드</th>
+              <th colspan="8" style="border-right:none;letter-spacing:6px;font-size:14px">공 고 문 대 시 보 드</th>
             </tr>
             <tr class="bh2">
+              <th>공고현황</th>
               <th>브 랜 드</th>
               <th>지 역</th>
               <th style="text-align:left;padding-left:12px">아 파 트</th>
@@ -1318,8 +1319,10 @@ function makeBidRow(b){
   const statusTxt = b.status==='공고'?'진행중':(b.status||'—');
   return`<tr data-bid="${b.id}">
     <td style="text-align:center">
+      <span class="${statusCls}" style="font-size:10px">${statusTxt}</span>
+    </td>
+    <td style="text-align:center">
       <span style="font-size:11px;font-weight:600;color:var(--navy)">${b.brand||'—'}</span>
-      <div style="margin-top:3px"><span class="${statusCls}" style="font-size:8px">${statusTxt}</span></div>
     </td>
     <td class="bid-rg" style="text-align:center">${rg||'—'}</td>
     <td style="padding-left:12px">
