@@ -814,19 +814,13 @@ let accState={info:true, excel:true, checklist:false, note:false};
 function loadAll(){
   const sv=localStorage.getItem('pour_sites_v3');
   sites=sv?JSON.parse(sv):DEFAULT_SITES.map(x=>({...x}));
-  const bv=localStorage.getItem('pour_bids_v2');
-  if(bv){
-    bidData=JSON.parse(bv);
-  } else {
-    bidData=BID_DATA_BASE.map(b=>({...b}));
-  }
-  // 구글 시트 URL 고정 (항상 자동 로드)
+  // 항상 구글시트에서 최신 데이터 불러오기 (샘플데이터 사용 안 함)
+  bidData=[];
   const FIXED_SHEET_URL='https://docs.google.com/spreadsheets/d/1uYftf05-dZ0VS3tPzvEV-G0fukcc8QFShXkbKMzRQ4U/export?format=csv&sheet=26%EB%85%84%20POUR%20%EA%B3%B5%EA%B3%A0%EB%AC%B8%20%ED%98%84%ED%99%A9';
-  const sheetUrl=localStorage.getItem('pour_sheets_url')||FIXED_SHEET_URL;
-  fetchSheetData(sheetUrl, false);
+  fetchSheetData(FIXED_SHEET_URL, false);
 }
 function saveSites(){localStorage.setItem('pour_sites_v3',JSON.stringify(sites));}
-function saveBids(){localStorage.setItem('pour_bids_v2',JSON.stringify(bidData));}
+function saveBids(){} // 구글시트 연동으로 localStorage 저장 안 함
 
 // ── GOOGLE SHEETS 연동 ──
 function openSheetsModal(){
