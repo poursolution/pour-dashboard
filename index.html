@@ -1297,7 +1297,7 @@ function renderBid(){
     if(!db||db==='—') return -1;
     return da.localeCompare(db);
   });
-  document.getElementById('bid-sub-txt').textContent=`총 ${fd.length}건 · 개찰일 임박순`;
+  document.getElementById('bid-sub-txt').textContent=`총 ${fd.length}건 · 개찰일 오름차순`;
   document.getElementById('bidTb').innerHTML=fd.map(b=>makeBidRow(b)).join('');
 }
 
