@@ -1294,6 +1294,8 @@ function renderBid(){
   });
   document.getElementById('bid-sub-txt').textContent=`총 ${fd.length}건 · 개찰일 오름차순`;
   document.getElementById('bidTb').innerHTML=fd.map(b=>makeBidRow(b)).join('');
+  // 탭 카운트 업데이트
+  document.getElementById('tcnt-bid').textContent=bidData.length;
 }
 
 function normalizeDate(val){
