@@ -1289,7 +1289,15 @@ function getBidFiltered(){
 
 function renderBid(){
   const fd=getBidFiltered();
-  document.getElementById('bid-sub-txt').textContent=`총 ${fd.length}건 · 현장설명회 및 개찰 일정`;
+  // 개찰일 기준 오름차순 정렬 (날짜 없는 건 맨 뒤로)
+  fd.sort((a,b)=>{
+    const da=normalizeDate(a.open||a.op||'');
+    const db=normalizeDate(b.open||b.op||'');
+    if(!da||da==='—') return 1;
+    if(!db||db==='—') return -1;
+    return da.localeCompare(db);
+  });
+  document.getElementById('bid-sub-txt').textContent=`총 ${fd.length}건 · 개찰일 임박순`;
   document.getElementById('bidTb').innerHTML=fd.map(b=>makeBidRow(b)).join('');
 }
 
