@@ -346,6 +346,9 @@ table.bid tbody td:last-child{border-right:none}
 .st-chip.유찰.active{background:var(--yellow);color:#fff;border-color:#d97706;box-shadow:0 2px 6px rgba(217,119,6,.35)}
 .st-chip.낙찰{background:#edf5f0;color:#4a8060;border-color:#b8d8c6}
 .st-chip.낙찰.active{background:var(--green);color:#fff;border-color:#15803d;box-shadow:0 2px 6px rgba(21,128,61,.35)}
+.st-chip.낙찰확인중{background:#f0f0ff;color:#5050c0;border-color:#c0c0e8}
+.st-chip.낙찰확인중.active{background:#7c3aed;color:#fff;border-color:#5b21b6;box-shadow:0 2px 6px rgba(124,58,237,.35)}
+.xt-st.y{background:#ede8ff;color:#5b21b6;border:1px solid #c4b5fd;font-size:8px;padding:2px 6px;border-radius:3px;font-weight:700;white-space:nowrap}
 .st-chip.취소{background:#f0f0f0;color:#888;border-color:#d0d0d0}
 .st-chip.취소.active{background:#6b7280;color:#fff;border-color:#4b5563;box-shadow:0 2px 6px rgba(107,114,128,.35)}
 
@@ -539,6 +542,7 @@ table.bid tbody td:last-child{border-right:none}
     <button class="fchip" data-bf="status" data-v="공고" onclick="sbf('status','공고',this)">진행중</button>
     <button class="fchip" data-bf="status" data-v="유찰" onclick="sbf('status','유찰',this)">유찰</button>
     <button class="fchip" data-bf="status" data-v="낙찰" onclick="sbf('status','낙찰',this)">낙찰</button>
+    <button class="fchip" data-bf="status" data-v="낙찰확인중" onclick="sbf('status','낙찰확인중',this)">낙찰확인중</button>
     <div class="fdiv"></div>
     <span class="flbl">공종</span>
     <button class="fchip on" data-bf="gong" data-v="all" onclick="sbf('gong','all',this)">전체</button>
@@ -865,7 +869,11 @@ async function fetchSheetData(csvUrl, showFeedback){
     const rows=parseCSV(text);
     if(rows.length<2) throw new Error('데이터가 없습니다');
     const headers=rows[0].map(h=>h.trim());
-    const parsed=rows.slice(1).filter(r=>r.some(c=>c.trim())).map((r,i)=>{
+    const parsed=rows.slice(1).filter(r=>r.some(c=>c&&c.trim())).map((r,i)=>{
+      // 컬럼 인덱스 기반 매핑
+      // B(1)=공고현황, C(2)=브랜드, F(5)=공종상세, G(6)=단지명
+      // H(7)=특허번호, M(12)=현설일, N(13)=개찰일, Q(16)=지역, R(17)=도시
+      const col=(idx)=>(r[idx]||'').trim();
       const get=(keys)=>{
         for(const k of keys){
           const idx=headers.findIndex(h=>h===k||h.toLowerCase()===k.toLowerCase());
@@ -874,20 +882,20 @@ async function fetchSheetData(csvUrl, showFeedback){
         return '';
       };
       // 상태값 정규화
-      let rawStatus=get(['공고현황','상태','status','공고']);
+      let rawStatus=col(1)||get(['공고현황','상태','status']);
       if(rawStatus==='진행중') rawStatus='공고';
       return {
         id:'gs'+i,
-        brand: get(['브랜드','brand','Brand']),
-        name:  get(['아파트','단지명','아파트명','name']),
-        region:get(['지역','region','Region']),
-        city:  get(['도시','city']),
-        gong:  get(['공사종류','공종','gong','공사']),
-        patent:get(['특허번호','특허','patent']),
-        hyunseol:get(['현장설명회','설명회','hyunseol']),
-        open:  get(['개찰일','open']),
-        status:rawStatus||'공고',
-        note:  get(['비고','note'])
+        brand:   col(2)||get(['브랜드']),
+        name:    col(6)||get(['단지명','아파트명']),
+        gong:    col(5)||get(['공종상세','공사종류','공종']),
+        patent:  col(7)||get(['특허번호','특허']),
+        hyunseol:col(12)||get(['현설일','현장설명회']),
+        open:    col(13)||get(['개찰일']),
+        region:  col(16)||get(['지역']),
+        city:    col(17)||get(['도시']),
+        status:  rawStatus||'공고',
+        note:    get(['비고','note'])
       };
     });
     bidData=parsed;
@@ -1288,7 +1296,7 @@ function renderBid(){
 
 function makeBidRow(b){
   const rg=[b.region||b.rg||'',b.city||''].filter(Boolean).join(' ');
-  const statusCls = b.status==='낙찰'?'xt-st':b.status==='유찰'?'xt-st b':'xt-st g';
+  const statusCls = b.status==='낙찰'?'xt-st':b.status==='유찰'?'xt-st b':b.status==='낙찰확인중'?'xt-st y':'xt-st g';
   const statusTxt = b.status==='공고'?'진행중':(b.status||'—');
   return`<tr data-bid="${b.id}">
     <td style="text-align:center">
