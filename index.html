@@ -820,9 +820,10 @@ function loadAll(){
   } else {
     bidData=BID_DATA_BASE.map(b=>({...b}));
   }
-  // 저장된 구글 시트 URL이 있으면 자동 로드
-  const sheetUrl=localStorage.getItem('pour_sheets_url');
-  if(sheetUrl) fetchSheetData(sheetUrl, false);
+  // 구글 시트 URL 고정 (항상 자동 로드)
+  const FIXED_SHEET_URL='https://docs.google.com/spreadsheets/d/1uYftf05-dZ0VS3tPzvEV-G0fukcc8QFShXkbKMzRQ4U/export?format=csv&sheet=26%EB%85%84%20POUR%20%EA%B3%B5%EA%B3%A0%EB%AC%B8%20%ED%98%84%ED%99%A9';
+  const sheetUrl=localStorage.getItem('pour_sheets_url')||FIXED_SHEET_URL;
+  fetchSheetData(sheetUrl, false);
 }
 function saveSites(){localStorage.setItem('pour_sites_v3',JSON.stringify(sites));}
 function saveBids(){localStorage.setItem('pour_bids_v2',JSON.stringify(bidData));}
