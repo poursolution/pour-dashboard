@@ -821,7 +821,7 @@ function loadAll(){
   // 항상 구글시트에서 최신 데이터 불러오기 (샘플데이터 사용 안 함)
   bidData=[];
   const FIXED_SHEET_URL='https://docs.google.com/spreadsheets/d/1uYftf05-dZ0VS3tPzvEV-G0fukcc8QFShXkbKMzRQ4U/export?format=csv&sheet=26%EB%85%84%20POUR%20%EA%B3%B5%EA%B3%A0%EB%AC%B8%20%ED%98%84%ED%99%A9';
-  const PATENT_SHEET_URL='https://docs.google.com/spreadsheets/d/1uYftf05-dZ0VS3tPzvEV-G0fukcc8QFShXkbKMzRQ4U/export?format=csv&sheet=%ED%8A%B9%ED%97%88';
+  const PATENT_SHEET_URL='https://docs.google.com/spreadsheets/d/1uYftf05-dZ0VS3tPzvEV-G0fukcc8QFShXkbKMzRQ4U/export?format=csv&gid=401781610';
   fetchPatentData(PATENT_SHEET_URL);
   fetchSheetData(FIXED_SHEET_URL, false);
 }
