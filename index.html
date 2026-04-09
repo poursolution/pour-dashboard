@@ -349,6 +349,8 @@ table.bid tbody td:last-child{border-right:none}
 .st-chip.낙찰확인중{background:#f0f0ff;color:#5050c0;border-color:#c0c0e8}
 .st-chip.낙찰확인중.active{background:#7c3aed;color:#fff;border-color:#5b21b6;box-shadow:0 2px 6px rgba(124,58,237,.35)}
 .xt-st.y{background:#ede8ff;color:#5b21b6;border:1px solid #c4b5fd;font-size:8px;padding:2px 6px;border-radius:3px;font-weight:700;white-space:nowrap}
+.xt-st.g{animation:blink-blue 1.4s ease-in-out infinite;}
+@keyframes blink-blue{0%,100%{background:#dbeafe;color:#1d4ed8;border-color:#93c5fd;}50%{background:#1d4ed8;color:#fff;border-color:#1d4ed8;}}
 .st-chip.취소{background:#f0f0f0;color:#888;border-color:#d0d0d0}
 .st-chip.취소.active{background:#6b7280;color:#fff;border-color:#4b5563;box-shadow:0 2px 6px rgba(107,114,128,.35)}
 
@@ -538,11 +540,11 @@ table.bid tbody td:last-child{border-right:none}
 <div id="tab-bid" class="hidden">
   <div class="fbar">
     <span class="flbl">공고현황</span>
-    <button class="fchip on" data-bf="status" data-v="all" onclick="sbf('status','all',this)">전체</button>
-    <button class="fchip" data-bf="status" data-v="공고" onclick="sbf('status','공고',this)">진행중</button>
+    <button class="fchip on" data-bf="status" data-v="공고" onclick="sbf('status','공고',this)">진행중</button>
     <button class="fchip" data-bf="status" data-v="유찰" onclick="sbf('status','유찰',this)">유찰</button>
     <button class="fchip" data-bf="status" data-v="낙찰" onclick="sbf('status','낙찰',this)">낙찰</button>
     <button class="fchip" data-bf="status" data-v="낙찰확인중" onclick="sbf('status','낙찰확인중',this)">낙찰확인중</button>
+    <button class="fchip" data-bf="status" data-v="all" onclick="sbf('status','all',this)">전체</button>
     <div class="fdiv"></div>
     <span class="flbl">공종</span>
     <button class="fchip on" data-bf="gong" data-v="all" onclick="sbf('gong','all',this)">전체</button>
@@ -806,8 +808,9 @@ const DEFAULT_SITES=[
 
 // ── STATE ──
 let sites=[], bidData=[], selId=null;
+let patentMap={}; // 특허번호 → 업체명 매핑
 let filt={type:'all',gong:'all',stage:'all'};
-let bfilt={status:'all',gong:'all'};
+let bfilt={status:'공고',gong:'all'};
 let efilt={cat:'all',status:'all',gong:'all'};
 // panel accordion state
 let accState={info:true, excel:true, checklist:false, note:false};
@@ -818,6 +821,8 @@ function loadAll(){
   // 항상 구글시트에서 최신 데이터 불러오기 (샘플데이터 사용 안 함)
   bidData=[];
   const FIXED_SHEET_URL='https://docs.google.com/spreadsheets/d/1uYftf05-dZ0VS3tPzvEV-G0fukcc8QFShXkbKMzRQ4U/export?format=csv&sheet=26%EB%85%84%20POUR%20%EA%B3%B5%EA%B3%A0%EB%AC%B8%20%ED%98%84%ED%99%A9';
+  const PATENT_SHEET_URL='https://docs.google.com/spreadsheets/d/1uYftf05-dZ0VS3tPzvEV-G0fukcc8QFShXkbKMzRQ4U/export?format=csv&sheet=%ED%8A%B9%ED%97%88';
+  fetchPatentData(PATENT_SHEET_URL);
   fetchSheetData(FIXED_SHEET_URL, false);
 }
 function saveSites(){localStorage.setItem('pour_sites_v3',JSON.stringify(sites));}
@@ -887,6 +892,7 @@ async function fetchSheetData(csvUrl, showFeedback){
         patent:  col(7)||get(['특허번호','특허']),
         hyunseol:col(12)||get(['현설일','현장설명회']),
         open:    col(13)||get(['개찰일']),
+        ann:     col(11)||get(['공고일']),
         region:  col(16)||get(['지역']),
         city:    col(17)||get(['도시']),
         status:  rawStatus||'공고',
@@ -1285,18 +1291,77 @@ function getBidFiltered(){
 
 function renderBid(){
   const fd=getBidFiltered();
-  // 개찰일 기준 오름차순 정렬 (날짜 없는 건 맨 뒤로)
+  // 현설일 기준 오름차순 정렬 (날짜 없는 건 맨 뒤로)
   fd.sort((a,b)=>{
-    const da=normalizeDate(a.open||a.op||'');
-    const db=normalizeDate(b.open||b.op||'');
+    const da=normalizeDate(a.hyunseol||a.hs||'');
+    const db=normalizeDate(b.hyunseol||b.hs||'');
     if(!da||da==='—') return 1;
     if(!db||db==='—') return -1;
     return da.localeCompare(db);
   });
-  document.getElementById('bid-sub-txt').textContent=`총 ${fd.length}건 · 개찰일 오름차순`;
+  document.getElementById('bid-sub-txt').textContent=`총 ${fd.length}건 · 현장설명회 오름차순`;
   document.getElementById('bidTb').innerHTML=fd.map(b=>makeBidRow(b)).join('');
   // 탭 카운트 업데이트
   document.getElementById('tcnt-bid').textContent=bidData.length;
+}
+
+async function fetchPatentData(url){
+  try{
+    const res=await fetch(url);
+    if(!res.ok) return;
+    const text=await res.text();
+    const rows=parseCSV(text);
+    if(rows.length<2) return;
+    const headers=rows[0].map(h=>h.trim());
+    const idxNo=headers.findIndex(h=>h==='특허번호');
+    const idxCo=headers.findIndex(h=>h==='업체명');
+    if(idxNo<0||idxCo<0) return;
+    patentMap={};
+    rows.slice(1).forEach(r=>{
+      const no=(r[idxNo]||'').trim().replace(/^10-/,'');
+      const co=(r[idxCo]||'').trim();
+      if(no) patentMap[no]=co;
+    });
+    renderBid();
+  }catch(e){ console.warn('특허 시트 로드 실패:', e); }
+}
+
+function getPatentColor(patentStr){
+  if(!patentStr||patentStr==='—') return '';
+  const nums=patentStr.split(/[,\s]+/).map(p=>p.trim().replace(/^10-/,'').replace(/[^0-9]/g,'')).filter(Boolean);
+  if(!nums.length) return '';
+  const POUR_COS=['㈜넷폼알앤디','넷폼알앤디'];
+  const GREEN_COS=['CNC공법','DO공법'];
+  let hasRed=false, hasGreen=false;
+  for(const num of nums){
+    const co=patentMap[num]||'';
+    if(!co) continue;
+    if(POUR_COS.some(p=>co.includes(p))) continue;
+    if(GREEN_COS.some(p=>co.includes(p))){ hasGreen=true; continue; }
+    hasRed=true;
+  }
+  if(hasRed) return 'red';
+  if(hasGreen) return 'green';
+  return '';
+}
+
+function renderPatentHtml(patentStr){
+  if(!patentStr||patentStr==='—') return '—';
+  const parts=patentStr.split(/[,\s]+/).map(p=>p.trim()).filter(Boolean);
+  const POUR_COS=['㈜넷폼알앤디','넷폼알앤디'];
+  const GREEN_COS=['CNC공법','DO공법'];
+  return parts.map(p=>{
+    const num=p.replace(/^10-/,'').replace(/[^0-9]/g,'');
+    const co=patentMap[num]||'';
+    let color='var(--navy)';
+    let tip=co||'';
+    if(co){
+      if(POUR_COS.some(x=>co.includes(x))) color='var(--navy)';
+      else if(GREEN_COS.some(x=>co.includes(x))) color='var(--green)';
+      else color='var(--red)';
+    }
+    return `<span style="color:${color};font-size:10px;" title="${tip}">${p}</span>`;
+  }).join('<br>');
 }
 
 function normalizeDate(val){
@@ -1317,7 +1382,23 @@ function makeBidRow(b){
   const rg=[b.region||b.rg||'',b.city||''].filter(Boolean).join(' ');
   const statusCls = b.status==='낙찰'?'xt-st':b.status==='유찰'?'xt-st b':b.status==='낙찰확인중'?'xt-st y':'xt-st g';
   const statusTxt = b.status==='공고'?'진행중':(b.status||'—');
-  return`<tr data-bid="${b.id}">
+  // 6. 공고일 연노란색 (오늘 or 어제 공고)
+  const today=new Date();
+  const yyyy=today.getFullYear();
+  const mm=String(today.getMonth()+1).padStart(2,'0');
+  const dd=String(today.getDate()).padStart(2,'0');
+  const todayStr=`${yyyy}-${mm}-${dd}`;
+  const yest=new Date(today); yest.setDate(yest.getDate()-1);
+  const yyyyY=yest.getFullYear();
+  const mmY=String(yest.getMonth()+1).padStart(2,'0');
+  const ddY=String(yest.getDate()).padStart(2,'0');
+  const yesterdayStr=`${yyyyY}-${mmY}-${ddY}`;
+  const annDate=normalizeDate(b.ann||b.open||'');
+  const isNew=(annDate===todayStr||annDate===yesterdayStr);
+  const rowBg=isNew?'background:#fffde7;':'';
+  // 3. 특허번호 색상
+  const patentHtml=renderPatentHtml(b.patent||b.pt||'');
+  return`<tr data-bid="${b.id}" style="${rowBg}">
     <td style="text-align:center">
       <span class="${statusCls}" style="font-size:10px">${statusTxt}</span>
     </td>
@@ -1332,7 +1413,7 @@ function makeBidRow(b){
       <div class="bid-gong">${b.gong||b.detail||'—'}</div>
     </td>
     <td>
-      <div class="bid-patent-txt" style="font-size:10px;color:var(--navy)">${b.patent||b.pt||'—'}</div>
+      <div class="bid-patent-txt">${patentHtml}</div>
     </td>
     <td class="bid-dc">${normalizeDate(b.hyunseol||b.hs||'')}</td>
     <td class="bid-dc open-dt">${normalizeDate(b.open||b.op||'')}</td>
