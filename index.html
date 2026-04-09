@@ -1330,14 +1330,15 @@ function getPatentColor(patentStr){
   if(!patentStr||patentStr==='—') return '';
   const nums=patentStr.split(/[,\s]+/).map(p=>p.trim().replace(/^10-/,'').replace(/[^0-9]/g,'')).filter(Boolean);
   if(!nums.length) return '';
-  const POUR_COS=['㈜넷폼알앤디','넷폼알앤디'];
-  const GREEN_COS=['CNC공법','DO공법'];
+  const POUR_COS=['넷폼알앤디'];
+  const GREEN_COS=['CNC공법','DO공법','cnc공법','do공법'];
   let hasRed=false, hasGreen=false;
   for(const num of nums){
     const co=patentMap[num]||'';
     if(!co) continue;
+    const coL=co.toLowerCase();
     if(POUR_COS.some(p=>co.includes(p))) continue;
-    if(GREEN_COS.some(p=>co.includes(p))){ hasGreen=true; continue; }
+    if(GREEN_COS.some(p=>coL.includes(p.toLowerCase()))){ hasGreen=true; continue; }
     hasRed=true;
   }
   if(hasRed) return 'red';
@@ -1348,16 +1349,17 @@ function getPatentColor(patentStr){
 function renderPatentHtml(patentStr){
   if(!patentStr||patentStr==='—') return '—';
   const parts=patentStr.split(/[,\s]+/).map(p=>p.trim()).filter(Boolean);
-  const POUR_COS=['㈜넷폼알앤디','넷폼알앤디'];
-  const GREEN_COS=['CNC공법','DO공법'];
+  const POUR_COS=['넷폼알앤디'];
+  const GREEN_COS=['cnc공법','do공법'];
   return parts.map(p=>{
     const num=p.replace(/^10-/,'').replace(/[^0-9]/g,'');
     const co=patentMap[num]||'';
     let color='var(--navy)';
     let tip=co||'';
     if(co){
+      const coL=co.toLowerCase();
       if(POUR_COS.some(x=>co.includes(x))) color='var(--navy)';
-      else if(GREEN_COS.some(x=>co.includes(x))) color='var(--green)';
+      else if(GREEN_COS.some(x=>coL.includes(x))) color='var(--green)';
       else color='var(--red)';
     }
     return `<span style="color:${color};font-size:10px;" title="${tip}">${p}</span>`;
