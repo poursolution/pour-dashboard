@@ -46,6 +46,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--gray);color:var(--na
 .fchip{border:1.5px solid var(--line);background:#fff;color:var(--navy);font-family:'Noto Sans KR',sans-serif;font-size:10px;font-weight:600;padding:3px 10px;border-radius:16px;cursor:pointer;transition:.15s;white-space:nowrap}
 .fchip:hover{border-color:var(--orange);color:var(--orange)}
 .fchip.on{background:var(--orange);border-color:var(--orange);color:#fff}
+.bf-sel{border:1.5px solid var(--line);background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6'><path d='M0 0l4 6 4-6z' fill='%232a3850'/></svg>") no-repeat right 8px center;color:var(--navy);font-family:'Noto Sans KR',sans-serif;font-size:10px;font-weight:600;padding:3px 22px 3px 10px;border-radius:16px;cursor:pointer;transition:.15s;white-space:nowrap;appearance:none;-webkit-appearance:none;-moz-appearance:none;outline:none}
+.bf-sel:hover{border-color:var(--orange);color:var(--orange)}
+.bf-sel.on{background-color:var(--orange);border-color:var(--orange);color:#fff;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6'><path d='M0 0l4 6 4-6z' fill='%23ffffff'/></svg>")}
 .fdiv{width:1px;height:16px;background:var(--line)}
 .srch-wrap{position:relative;margin-left:auto}
 .srch{border:1.5px solid var(--line);border-radius:6px;padding:5px 9px 5px 26px;font-family:'Noto Sans KR',sans-serif;font-size:11px;color:var(--navy);background:var(--gray);width:170px;transition:.2s}
@@ -471,6 +474,14 @@ table.bid tbody td:last-child{border-right:none}
     <button class="fchip" data-bf="gong" data-v="금속기와" onclick="sbf('gong','금속기와',this)">금속기와</button>
     <button class="fchip" data-bf="gong" data-v="PVC" onclick="sbf('gong','PVC',this)">PVC</button>
     <button class="fchip" data-bf="gong" data-v="재도장" onclick="sbf('gong','재도장',this)">재도장</button>
+    <div class="fdiv"></div>
+    <span class="flbl">브랜드</span>
+    <select id="bfilt-brand" class="bf-sel" onchange="setBrandFilter(this)">
+      <option value="all">전체</option>
+      <option value="POUR">POUR</option>
+      <option value="DO">DO</option>
+      <option value="CNC">CNC</option>
+    </select>
     <div class="srch-wrap">
       <span class="srch-ico">🔍</span>
       <input class="srch" id="srchBid" placeholder="아파트명 검색..." oninput="renderBid()">
@@ -1433,7 +1444,7 @@ const POUR26=[{"no":"1","cat":"실행공사","st":"낙찰","tp":"실행","d":"�
 
 // 공고문대시보드 상태
 let bidData=[];
-let bfilt={status:'공고',gong:'all'};
+let bfilt={status:'공고',gong:'all',brand:'all'};
 let patentMap={};
 let _addrPopover=null;
 
@@ -1454,6 +1465,7 @@ function parseCSV(text){
 }
 
 function sbf(t,v,el){bfilt[t]=v;el.closest('.fbar').querySelectorAll('[data-bf="'+t+'"]').forEach(b=>b.classList.remove('on'));el.classList.add('on');renderBid();}
+function setBrandFilter(sel){bfilt.brand=sel.value;if(sel.value==='all')sel.classList.remove('on');else sel.classList.add('on');renderBid();}
 function saveBids(){}
 
 async function fetchSheetData(csvUrl,showFeedback){
@@ -1571,6 +1583,7 @@ function getBidFiltered(){
   return bidData.filter(b=>{
     if(bfilt.status!=='all'&&b.status!==bfilt.status)return false;
     if(bfilt.gong!=='all'&&!(b.gong||b.detail||'').includes(bfilt.gong))return false;
+    if(bfilt.brand!=='all'&&!(b.brand||'').toUpperCase().includes(bfilt.brand.toUpperCase()))return false;
     if(q&&!(b.name||'').toLowerCase().includes(q))return false;
     return true;
   });
