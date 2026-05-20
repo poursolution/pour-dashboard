@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>POUR 현황판 대시보드</title>
+<title>POUR 공고문 대시보드</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -241,6 +241,9 @@ table.pay-tb td{padding:7px 9px;border-bottom:1px solid var(--line)}
 .ds{padding:14px 22px 22px}
 .bid-wrap{background:#fff;border-radius:var(--r);box-shadow:var(--shadow-md);overflow:hidden;border:1.5px solid #c8d0db}
 .bid-scroll{overflow-x:auto}
+.bid-grid{display:flex;gap:14px;padding:0 12px 12px}
+.bid-grid > .bid-scroll{flex:1 1 0;min-width:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+@media(max-width:1280px){.bid-grid{flex-direction:column;gap:10px}}
 table.bid{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
 table.bid thead tr.bh1 th{background:var(--navy-dk);color:#fff;padding:9px 12px;text-align:center;letter-spacing:6px;font-size:13px;font-weight:700;border-right:2px solid rgba(255,255,255,.18)}
 table.bid thead tr.bh2 th{background:var(--navy);color:#fff;padding:8px 9px;font-size:11px;font-weight:700;text-align:center;border-right:1px solid rgba(255,255,255,.12);white-space:nowrap}
@@ -352,7 +355,7 @@ table.bid tbody td:last-child{border-right:none}
   <div class="logo-row">
     <div class="logo">POUR</div>
     <div>
-      <div class="hdr-title" id="hdrTitle">현황판 대시보드</div>
+      <div class="hdr-title" id="hdrTitle">공고문 대시보드</div>
       <div class="hdr-sub">넷폼알앤디 기술연구소 · 공사진행 관리시스템</div>
     </div>
   </div>
@@ -368,14 +371,14 @@ table.bid tbody td:last-child{border-right:none}
 </div>
 
 <!-- MAIN TABS -->
-<div class="tabs" id="mainTabs">
+<div class="tabs" id="mainTabs" style="display:none">
   <button class="tab active" onclick="switchTab('board')">🏗 공사진행현황 <span class="tcnt" id="tcnt-board">0</span></button>
   <button class="tab" onclick="switchTab('bid')">📌 공고문대시보드 <span class="tcnt g" id="tcnt-bid">0</span></button>
   <button class="tab" onclick="switchTab('dash')">📊 현장대시보드 <span class="tcnt g" id="tcnt-dash">0</span></button>
 </div>
 
-<!-- ═══ TAB 1: 공사진행현황 (v2 현장목록) ═══ -->
-<div id="tab-board">
+<!-- ═══ TAB 1: 공사진행현황 (사용 안 함, 숨김) ═══ -->
+<div id="tab-board" style="display:none">
   <div class="stats-bar">
     <div class="sc or"><div class="sc-lbl">전체 현장</div><div class="sc-val" id="s-tot">0</div><div class="sc-sub">등록 현장</div></div>
     <div class="sc bl"><div class="sc-lbl">실행현장</div><div class="sc-val" id="s-ex">0</div><div class="sc-sub">컨설팅·관리</div></div>
@@ -456,8 +459,8 @@ table.bid tbody td:last-child{border-right:none}
   </div>
 </div>
 
-<!-- ═══ TAB 2: 공고문대시보드 (index.html 원본) ═══ -->
-<div id="tab-bid" class="hidden">
+<!-- ═══ TAB 2: 공고문대시보드 (메인) ═══ -->
+<div id="tab-bid">
   <div class="fbar">
     <span class="flbl">공고현황</span>
     <button class="fchip on" data-bf="status" data-v="공고" onclick="sbf('status','공고',this)">진행중</button>
@@ -500,22 +503,39 @@ table.bid tbody td:last-child{border-right:none}
     </div>
     <div id="sheets-status" style="display:none;padding:5px 0 8px;font-size:10px;color:var(--green);font-weight:600"></div>
     <div class="bid-wrap">
-      <div class="bid-scroll">
-        <table class="bid">
-          <colgroup>
-            <col style="width:70px"><col style="width:80px"><col style="width:80px"><col style="width:150px">
-            <col style="width:140px"><col style="width:130px"><col style="width:85px"><col style="width:130px"><col style="width:85px">
-          </colgroup>
-          <thead>
-            <tr class="bh1"><th colspan="9" style="border-right:none;letter-spacing:6px;font-size:14px">공 고 문 대 시 보 드</th></tr>
-            <tr class="bh2">
-              <th style="text-align:center">구분</th><th>브랜드</th><th>지역</th>
-              <th style="text-align:left;padding-left:6px">아파트</th><th>공사종류</th>
-              <th>특허번호</th><th>공고일</th><th>현설일</th><th>개찰일</th>
-            </tr>
-          </thead>
-          <tbody id="bidTb"></tbody>
-        </table>
+      <div class="bid-grid">
+        <div class="bid-scroll">
+          <table class="bid">
+            <colgroup>
+              <col style="width:62px"><col style="width:65px"><col style="width:68px"><col style="width:130px">
+              <col style="width:115px"><col style="width:110px"><col style="width:72px"><col style="width:110px"><col style="width:72px">
+            </colgroup>
+            <thead>
+              <tr class="bh2">
+                <th style="text-align:center">구분</th><th>브랜드</th><th>지역</th>
+                <th style="text-align:left;padding-left:6px">아파트</th><th>공사종류</th>
+                <th>특허번호</th><th>공고일</th><th>현설일</th><th>개찰일</th>
+              </tr>
+            </thead>
+            <tbody id="bidTb"></tbody>
+          </table>
+        </div>
+        <div class="bid-scroll">
+          <table class="bid">
+            <colgroup>
+              <col style="width:62px"><col style="width:65px"><col style="width:68px"><col style="width:130px">
+              <col style="width:115px"><col style="width:110px"><col style="width:72px"><col style="width:110px"><col style="width:72px">
+            </colgroup>
+            <thead>
+              <tr class="bh2">
+                <th style="text-align:center">구분</th><th>브랜드</th><th>지역</th>
+                <th style="text-align:left;padding-left:6px">아파트</th><th>공사종류</th>
+                <th>특허번호</th><th>공고일</th><th>현설일</th><th>개찰일</th>
+              </tr>
+            </thead>
+            <tbody id="bidTb2"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -914,7 +934,7 @@ table.bid tbody td:last-child{border-right:none}
 </div>
 
 <div class="toast" id="toast"></div>
-<button id="partner-fab" onclick="openPartnerModal()" title="파트너 플랫폼에서 현장 가져오기"><span class="fab-dot"></span>파트너 연동</button>
+<button id="partner-fab" onclick="openPartnerModal()" title="파트너 플랫폼에서 현장 가져오기" style="display:none"><span class="fab-dot"></span>파트너 연동</button>
 <div id="drop-overlay">
   <div class="drop-box"><div class="drop-ico">📥</div><div class="drop-ttl">현장 데이터를 여기에 놓으세요</div><div class="drop-sub">파트너 플랫폼의 현장 행을 드래그하여 가져옵니다</div></div>
   <button class="drop-cancel" onclick="hideDropZone()">취소</button>
@@ -1592,7 +1612,11 @@ function renderBid(){
   const fd=getBidFiltered();
   fd.sort((a,b)=>{const da=normalizeDate(a.hyunseol||a.hs||'');const db=normalizeDate(b.hyunseol||b.hs||'');if(!da||da==='—')return 1;if(!db||db==='—')return -1;return da.localeCompare(db);});
   document.getElementById('bid-sub-txt').textContent='총 '+fd.length+'건 · 현장설명회 오름차순';
-  document.getElementById('bidTb').innerHTML=fd.map(b=>makeBidRow(b)).join('');
+  const half=Math.ceil(fd.length/2);
+  const left=fd.slice(0,half),right=fd.slice(half);
+  document.getElementById('bidTb').innerHTML=left.map(b=>makeBidRow(b)).join('');
+  const tb2=document.getElementById('bidTb2');
+  if(tb2)tb2.innerHTML=right.map(b=>makeBidRow(b)).join('');
   updateTabCounts();
 }
 function makeBidRow(b){
@@ -1781,13 +1805,9 @@ function copyStorageScript(){navigator.clipboard.writeText(STORAGE_SCRIPT).then(
 async function init(){
   document.getElementById('todayDate').textContent=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
   checkHash();
-  // 공사진행현황: 구글시트 동기화
-  await loadFromGoogleSheets();
   // 공고문대시보드: 구글시트 자동 연동 (고정 URL)
   fetchPatentData(PATENT_SHEET_URL);
   fetchSheetData(FIXED_SHEET_URL,false);
-  // 파트너 FAB 뱃지 업데이트
-  updateFabBadge();
 }
 init();
 </script>
