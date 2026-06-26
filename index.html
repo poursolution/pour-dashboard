@@ -347,6 +347,38 @@ table.bid tbody td:last-child{border-right:none}
   .dtabs{padding:0 8px}.dtab{font-size:10px;padding:8px 8px}
 }
 .hidden{display:none!important}
+/* === ANALYTICS === */
+.asect{background:#fff;border:1px solid var(--line);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
+.asect-h{background:var(--navy-lt);color:var(--navy);font-size:12px;font-weight:700;padding:10px 14px;border-bottom:1px solid var(--line)}
+.acards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.acard{background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:13px 14px;display:flex;flex-direction:column;gap:6px}
+.acard-co{font-size:11px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px}
+.acard-co-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.acard-num{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--navy);line-height:1;letter-spacing:1px}
+.acard-prev{font-size:10px;color:var(--txt);font-weight:500}
+.acard-yoy{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 9px;border-radius:4px;width:fit-content;margin-top:2px}
+.acard-yoy.up{background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd)}
+.acard-yoy.dn{background:var(--red-lt);color:var(--red)}
+.acard-yoy.flat{background:var(--gray);color:var(--txt)}
+.acard-ref{font-size:10px;color:var(--txt2);font-weight:500;padding-top:5px;margin-top:2px;border-top:1px dashed var(--line)}
+.atbl td.future{background:#fafbfc;color:var(--txt2);font-size:9px}
+.atbl{width:100%;border-collapse:collapse;font-size:11px;font-family:'Noto Sans KR',sans-serif}
+.atbl th{background:var(--gray);color:var(--navy);font-weight:700;padding:9px 10px;text-align:center;border-bottom:1px solid var(--line);border-right:1px solid var(--line);white-space:nowrap}
+.atbl th:last-child{border-right:none}
+.atbl td{padding:7px 10px;text-align:center;border-bottom:1px solid var(--line);border-right:1px solid var(--line);color:var(--navy);white-space:nowrap}
+.atbl td:last-child{border-right:none}
+.atbl tr:last-child td{border-bottom:none}
+.atbl tr:hover td{background:#fafbfc}
+.atbl td.co{text-align:left;font-weight:700;background:var(--navy-lt);border-right:2px solid var(--line)}
+.atbl td.yr25{background:#eef3fa;font-weight:700;color:var(--navy-md);font-size:10px}
+.atbl td.yr26{background:#d8e4f3;font-weight:700;color:var(--navy);font-size:10px}
+.atbl td.sum{background:var(--gray);font-weight:700;color:var(--navy)}
+.atbl td.gain{background:var(--green-lt);color:var(--green);font-weight:700}
+.atbl td.loss{background:var(--red-lt);color:var(--red);font-weight:700}
+.atbl td.zero{color:var(--txt2)}
+.aplus{color:var(--green);font-weight:700;font-size:9px}
+.aminus{color:var(--red);font-weight:700;font-size:9px}
+.askel{padding:30px;text-align:center;color:var(--txt);font-size:12px}
 </style>
 </head>
 <body>
@@ -371,10 +403,11 @@ table.bid tbody td:last-child{border-right:none}
 </div>
 
 <!-- MAIN TABS -->
-<div class="tabs" id="mainTabs" style="display:none">
-  <button class="tab active" onclick="switchTab('board')">🏗 공사진행현황 <span class="tcnt" id="tcnt-board">0</span></button>
-  <button class="tab" onclick="switchTab('bid')">📌 공고문대시보드 <span class="tcnt g" id="tcnt-bid">0</span></button>
-  <button class="tab" onclick="switchTab('dash')">📊 현장대시보드 <span class="tcnt g" id="tcnt-dash">0</span></button>
+<div class="tabs" id="mainTabs">
+  <button class="tab" onclick="switchTab('board')" style="display:none">🏗 공사진행현황 <span class="tcnt" id="tcnt-board">0</span></button>
+  <button class="tab active" onclick="switchTab('bid')">📌 공고문대시보드 <span class="tcnt g" id="tcnt-bid">0</span></button>
+  <button class="tab" onclick="switchTab('dash')" style="display:none">📊 현장대시보드 <span class="tcnt g" id="tcnt-dash">0</span></button>
+  <button class="tab" onclick="switchTab('analytics')">📈 데이터 분석</button>
 </div>
 
 <!-- ═══ TAB 1: 공사진행현황 (사용 안 함, 숨김) ═══ -->
@@ -537,6 +570,60 @@ table.bid tbody td:last-child{border-right:none}
           </table>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB 4: 데이터 분석 (Analytics) ═══ -->
+<div id="tab-analytics" class="hidden">
+  <div class="fbar">
+    <span class="flbl">분석 기준</span>
+    <button class="fchip on" data-amethod="공고문" onclick="setAMethod('공고문',this)">공고문 단위</button>
+    <button class="fchip" data-amethod="공종" onclick="setAMethod('공종',this)">공종별</button>
+    <div class="fdiv"></div>
+    <span class="flbl">기간</span>
+    <span style="font-size:10px;color:var(--txt);font-weight:600">2026년 1월 ~ 6월 (25년 동기 대비)</span>
+    <div style="margin-left:auto;display:flex;gap:7px;align-items:center">
+      <span id="aStatus" style="font-size:10px;color:var(--txt)"></span>
+      <button class="hbtn sm" onclick="loadAllBidsData()">🔄 새로고침</button>
+    </div>
+  </div>
+  <div class="ds">
+    <div class="bh" style="padding:10px 0">
+      <div>
+        <div class="bh-title">데 이 터 분 석</div>
+        <div class="bh-sub" id="analytics-sub">2025년 1~6월 대비 2026년 1~6월 추이 · 구글시트 라이브 연동</div>
+      </div>
+    </div>
+
+    <!-- POUR vs 타사 종합 -->
+    <div class="asect">
+      <div class="asect-h">📊 26년 1~6월 전체 공고 현황 (구분별)</div>
+      <div id="aOverview" style="padding:0"></div>
+    </div>
+
+    <!-- 6개 업체 카드 -->
+    <div class="asect">
+      <div class="asect-h" id="aCardsTitle">🏢 업체별 누계 비교 (1~6월 공고문 단위)</div>
+      <div class="acards" id="aCards" style="padding:14px"></div>
+    </div>
+
+    <!-- 월별 추이 -->
+    <div class="asect">
+      <div class="asect-h">📅 월별 추이 (1~6월)</div>
+      <div id="aMonthly" style="padding:0;overflow-x:auto"></div>
+    </div>
+
+    <!-- 공종별 분포 -->
+    <div class="asect">
+      <div class="asect-h">🏗 공종별 분포 (대분류)</div>
+      <div id="aGongDist" style="padding:0;overflow-x:auto"></div>
+    </div>
+
+    <!-- 월별 격차 -->
+    <div class="asect">
+      <div class="asect-h">📉 월별 격차 (26년 - 25년)</div>
+      <div id="aGap" style="padding:0;overflow-x:auto"></div>
     </div>
   </div>
 </div>
@@ -1059,8 +1146,8 @@ function checkHash(){const hash=location.hash;if(hash.startsWith('#open=')){cons
 // ── 메인 탭 전환 ──
 function switchTab(t){
   currentMainTab=t;
-  ['board','bid','dash'].forEach(id=>document.getElementById('tab-'+id).classList.toggle('hidden',id!==t));
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',['board','bid','dash'][i]===t));
+  ['board','bid','dash','analytics'].forEach(id=>document.getElementById('tab-'+id).classList.toggle('hidden',id!==t));
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',['board','bid','dash','analytics'][i]===t));
   document.getElementById('view-detail').classList.add('hidden');
   document.getElementById('mainTabs').style.display='';
   document.getElementById('backTopBtn').style.display='none';
@@ -1068,6 +1155,7 @@ function switchTab(t){
   if(t==='board')renderList();
   if(t==='bid')renderBid();
   if(t==='dash')renderDash();
+  if(t==='analytics'){if(!aLoaded){loadAllBidsData();}else{renderAnalytics();}}
 }
 function updateTabCounts(){
   document.getElementById('tcnt-board').textContent=sites.length;
@@ -1800,6 +1888,318 @@ function initGuideScripts(){
 }
 function copyDragScript(){navigator.clipboard.writeText(DRAG_SCRIPT).then(()=>showToast('드래그 코드 복사됨','ok'));}
 function copyStorageScript(){navigator.clipboard.writeText(STORAGE_SCRIPT).then(()=>showToast('저장소 코드 복사됨','ok'));}
+
+// ═══════════════════════════════════════════════════════
+// ── 데이터 분석 (Analytics) ──
+// ═══════════════════════════════════════════════════════
+const ALL_BIDS_SHEET_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv&sheet=26%EB%85%84%20%EC%A0%84%EC%B2%B4%20%EA%B3%B5%EA%B3%A0%EB%AC%B8';
+
+// 25년 1~12월 baseline (방식별)
+const BASE_25_공고={
+  '㈜넷폼알앤디':[13,27,67,84,48,32,38,57,62,34,32,12],
+  '4A시스템':[42,83,111,121,73,51,66,72,76,34,34,29],
+  '금영ENC':[5,20,33,52,26,28,26,26,32,33,17,4],
+  '펜테크':[1,10,12,19,15,5,7,6,17,5,3,4],
+  'DO공법':[0,0,1,2,2,1,1,3,4,0,2,1],
+  'CNC공법':[0,0,0,0,0,0,0,0,0,1,0,0]
+};
+const BASE_25_공종={
+  '㈜넷폼알앤디':[14,30,77,96,50,36,41,61,65,36,36,18],
+  '4A시스템':[54,93,125,138,86,58,75,77,84,37,39,35],
+  '금영ENC':[6,21,38,57,27,30,27,29,32,33,20,4],
+  '펜테크':[2,10,13,21,18,5,8,7,17,5,3,6],
+  'DO공법':[0,0,1,3,2,1,2,3,4,0,3,1],
+  'CNC공법':[0,0,0,0,0,0,0,0,0,1,0,0]
+};
+// 25년 월별 공종 분포 (YTD 동기 비교용)
+const BASE_25_공종분포_월={
+  '㈜넷폼알앤디':{1:{옥상방수:1,재도장:7,주차장:1,도로:2,기타:3},2:{옥상방수:10,재도장:16,주차장:4,도로:0,기타:0},3:{옥상방수:37,재도장:26,주차장:10,도로:3,기타:1},4:{옥상방수:54,재도장:25,주차장:10,도로:6,기타:1},5:{옥상방수:20,재도장:8,주차장:12,도로:6,기타:4},6:{옥상방수:16,재도장:17,주차장:2,도로:0,기타:1},7:{옥상방수:19,재도장:10,주차장:6,도로:4,기타:2},8:{옥상방수:24,재도장:20,주차장:8,도로:5,기타:4},9:{옥상방수:21,재도장:13,주차장:13,도로:14,기타:4},10:{옥상방수:20,재도장:8,주차장:3,도로:5,기타:0},11:{옥상방수:17,재도장:14,주차장:2,도로:1,기타:2},12:{옥상방수:5,재도장:9,주차장:3,도로:0,기타:1}},
+  '4A시스템':{1:{옥상방수:12,재도장:32,주차장:6,도로:2,기타:2},2:{옥상방수:22,재도장:55,주차장:10,도로:5,기타:1},3:{옥상방수:31,재도장:69,주차장:12,도로:9,기타:4},4:{옥상방수:34,재도장:68,주차장:23,도로:10,기타:3},5:{옥상방수:24,재도장:30,주차장:14,도로:11,기타:7},6:{옥상방수:11,재도장:24,주차장:15,도로:4,기타:4},7:{옥상방수:18,재도장:39,주차장:13,도로:2,기타:3},8:{옥상방수:15,재도장:41,주차장:13,도로:7,기타:1},9:{옥상방수:18,재도장:37,주차장:15,도로:9,기타:5},10:{옥상방수:12,재도장:12,주차장:8,도로:5,기타:0},11:{옥상방수:8,재도장:21,주차장:6,도로:4,기타:0},12:{옥상방수:5,재도장:22,주차장:6,도로:2,기타:0}},
+  '금영ENC':{1:{옥상방수:1,재도장:1,주차장:4,도로:0,기타:0},2:{옥상방수:6,재도장:6,주차장:5,도로:4,기타:0},3:{옥상방수:13,재도장:11,주차장:12,도로:2,기타:0},4:{옥상방수:23,재도장:8,주차장:14,도로:10,기타:2},5:{옥상방수:13,재도장:1,주차장:4,도로:9,기타:0},6:{옥상방수:10,재도장:4,주차장:7,도로:7,기타:2},7:{옥상방수:6,재도장:2,주차장:10,도로:7,기타:2},8:{옥상방수:10,재도장:2,주차장:10,도로:5,기타:2},9:{옥상방수:13,재도장:2,주차장:14,도로:1,기타:2},10:{옥상방수:8,재도장:4,주차장:12,도로:8,기타:1},11:{옥상방수:6,재도장:3,주차장:7,도로:1,기타:3},12:{옥상방수:1,재도장:0,주차장:2,도로:1,기타:0}},
+  '펜테크':{1:{옥상방수:1,재도장:1,주차장:0,도로:0,기타:0},2:{옥상방수:8,재도장:2,주차장:0,도로:0,기타:0},3:{옥상방수:8,재도장:4,주차장:1,도로:0,기타:0},4:{옥상방수:14,재도장:7,주차장:0,도로:0,기타:0},5:{옥상방수:13,재도장:4,주차장:1,도로:0,기타:0},6:{옥상방수:3,재도장:2,주차장:0,도로:0,기타:0},7:{옥상방수:7,재도장:1,주차장:0,도로:0,기타:0},8:{옥상방수:6,재도장:1,주차장:0,도로:0,기타:0},9:{옥상방수:15,재도장:1,주차장:0,도로:0,기타:1},10:{옥상방수:4,재도장:0,주차장:0,도로:0,기타:1},11:{옥상방수:2,재도장:0,주차장:1,도로:0,기타:0},12:{옥상방수:3,재도장:1,주차장:2,도로:0,기타:0}},
+  'DO공법':{1:{옥상방수:0,재도장:0,주차장:0,도로:0,기타:0},2:{옥상방수:0,재도장:0,주차장:0,도로:0,기타:0},3:{옥상방수:0,재도장:1,주차장:0,도로:0,기타:0},4:{옥상방수:2,재도장:1,주차장:0,도로:0,기타:0},5:{옥상방수:0,재도장:1,주차장:1,도로:0,기타:0},6:{옥상방수:0,재도장:0,주차장:1,도로:0,기타:0},7:{옥상방수:1,재도장:1,주차장:0,도로:0,기타:0},8:{옥상방수:1,재도장:1,주차장:1,도로:0,기타:0},9:{옥상방수:2,재도장:1,주차장:1,도로:0,기타:0},10:{옥상방수:0,재도장:0,주차장:0,도로:0,기타:0},11:{옥상방수:1,재도장:2,주차장:0,도로:0,기타:0},12:{옥상방수:0,재도장:1,주차장:0,도로:0,기타:0}},
+  'CNC공법':{1:{},2:{},3:{},4:{},5:{},6:{},7:{},8:{},9:{},10:{옥상방수:1},11:{},12:{}}
+};
+function get25CumulativeDist(uptoMonth){
+  const r={};
+  TARGETS.forEach(t=>{
+    r[t]={옥상방수:0,재도장:0,주차장:0,도로:0,기타:0};
+    const mm=BASE_25_공종분포_월[t]||{};
+    for(let m=1;m<=uptoMonth;m++){
+      const md=mm[m]||{};
+      공종_COLS.forEach(c=>{r[t][c]+=(md[c]||0);});
+    }
+  });
+  return r;
+}
+const TARGETS=['㈜넷폼알앤디','4A시스템','금영ENC','펜테크','DO공법','CNC공법'];
+const CO_COLORS={'㈜넷폼알앤디':'#E87722','4A시스템':'#3b82f6','금영ENC':'#f5a623','펜테크':'#7c3aed','DO공법':'#18a360','CNC공법':'#e84040'};
+const 공종_COLS=['옥상방수','재도장','주차장','도로','기타'];
+
+let allBidsData=null;
+let aMethod='공고문';
+let aLoaded=false;
+let 신기술Map={};
+
+function extract신기술Num(s){
+  if(!s)return null;
+  const str=String(s).trim();
+  if(!str.includes('신기술')&&!str.includes('건설'))return null;
+  const m=str.match(/(\d+)/);
+  return m?parseInt(m[1]):null;
+}
+function build신기술Map(){
+  신기술Map={};
+  for(const key in patentMap){
+    const num=extract신기술Num(key);
+    if(num!==null&&!(num in 신기술Map))신기술Map[num]=patentMap[key];
+  }
+  신기술Map[1026]='㈜넷폼알앤디';
+}
+function canonCo(co){
+  if(!co)return null;
+  const map={'4A':'4A시스템','㈜수퍼크랙실':'수퍼크랙실','㈜펜테크':'펜테크','㈜피엠씨':'피엠씨'};
+  return map[co]||co;
+}
+function aLookup(p){
+  if(!p)return null;
+  const trim=String(p).trim();
+  if(!trim)return null;
+  const stripped=trim.replace(/^10-/,'');
+  if(patentMap[stripped])return canonCo(patentMap[stripped]);
+  if(patentMap[trim])return canonCo(patentMap[trim]);
+  const num=extract신기술Num(trim);
+  if(num!==null&&신기술Map[num])return canonCo(신기술Map[num]);
+  return null;
+}
+
+async function loadAllBidsData(){
+  const statusEl=document.getElementById('aStatus');
+  if(statusEl)statusEl.textContent='⏳ 데이터 불러오는 중...';
+  try{
+    const res=await fetch(ALL_BIDS_SHEET_URL);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const text=await res.text();
+    const rows=parseCSV(text);
+    if(rows.length<2)throw new Error('데이터 없음');
+    const headers=rows[0].map(h=>h.trim());
+    const idx={};
+    ['NO.','구분','옥상방수','재도장','주차장','도로','기타','단지명','특허번호','공고일'].forEach(k=>{
+      idx[k]=headers.indexOf(k);
+    });
+    allBidsData=rows.slice(1).filter(r=>r.some(c=>c&&c.trim())).map(r=>({
+      구분:(idx['구분']>=0?(r[idx['구분']]||'').trim():''),
+      단지명:(idx['단지명']>=0?(r[idx['단지명']]||'').trim():''),
+      특허번호:(idx['특허번호']>=0?(r[idx['특허번호']]||'').trim():''),
+      공고일:(idx['공고일']>=0?(r[idx['공고일']]||'').trim():''),
+      옥상방수:(idx['옥상방수']>=0?(r[idx['옥상방수']]||'').trim():''),
+      재도장:(idx['재도장']>=0?(r[idx['재도장']]||'').trim():''),
+      주차장:(idx['주차장']>=0?(r[idx['주차장']]||'').trim():''),
+      도로:(idx['도로']>=0?(r[idx['도로']]||'').trim():''),
+      기타:(idx['기타']>=0?(r[idx['기타']]||'').trim():'')
+    }));
+    aLoaded=true;
+    if(statusEl)statusEl.textContent='✓ '+allBidsData.length+'건 로드됨';
+    renderAnalytics();
+  }catch(e){
+    console.error('전체 공고문 로드 실패:',e);
+    if(statusEl){statusEl.style.color='var(--red)';statusEl.textContent='❌ 로드 실패: '+e.message;}
+  }
+}
+
+function compute26(){
+  if(!allBidsData)return{공고:{},공종:{},공종분포:{},overview:{}};
+  build신기술Map();
+  const 공고={},공종={},공종분포={};
+  const overview={POUR:0,타사:0,일반:0,다특허:0,'다특허(PD)':0,DO:0,CNC:0,전체:0};
+  TARGETS.forEach(t=>{
+    공고[t]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    공종[t]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    공종분포[t]={옥상방수:0,재도장:0,주차장:0,도로:0,기타:0};
+  });
+  const 공고Seen=new Set(),공종Seen=new Set();
+  allBidsData.forEach(row=>{
+    if(!row.공고일)return;
+    const d=new Date(row.공고일);
+    if(isNaN(d.getTime()))return;
+    if(d.getFullYear()!==2026)return;
+    const month=d.getMonth()+1;
+    if(month<1||month>12)return;
+    overview.전체++;
+    if(row.구분 in overview)overview[row.구분]++;
+    const co=aLookup(row.특허번호);
+    if(!co||!TARGETS.includes(co))return;
+    const k1=row.단지명+'|'+row.공고일+'|'+co;
+    if(!공고Seen.has(k1)){공고Seen.add(k1);공고[co][month-1]++;}
+    공종_COLS.forEach(gc=>{
+      const v=row[gc];
+      if(!v||!v.trim())return;
+      v.split('\n').forEach(sub=>{
+        sub=sub.trim();
+        if(!sub)return;
+        const k2=row.단지명+'|'+row.공고일+'|'+gc+'|'+sub+'|'+co;
+        if(!공종Seen.has(k2)){공종Seen.add(k2);공종[co][month-1]++;공종분포[co][gc]++;}
+      });
+    });
+  });
+  return{공고,공종,공종분포,overview};
+}
+
+function setAMethod(m,el){
+  aMethod=m;
+  document.querySelectorAll('[data-amethod]').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('aCardsTitle').textContent='🏢 업체별 누계 비교 (1~6월 '+(m==='공고문'?'공고문 단위':'공종별')+')';
+  renderAnalytics();
+}
+
+function renderAnalytics(){
+  if(!aLoaded){
+    document.getElementById('aCards').innerHTML='<div class="askel">데이터 로딩 대기 중...</div>';
+    document.getElementById('aOverview').innerHTML='<div class="askel">-</div>';
+    document.getElementById('aMonthly').innerHTML='<div class="askel">-</div>';
+    document.getElementById('aGongDist').innerHTML='<div class="askel">-</div>';
+    document.getElementById('aGap').innerHTML='<div class="askel">-</div>';
+    return;
+  }
+  const data=compute26();
+  const cur26=aMethod==='공고문'?data.공고:data.공종;
+  const base25=aMethod==='공고문'?BASE_25_공고:BASE_25_공종;
+
+  // 현재 시점 결정 (YTD 비교용)
+  const today=new Date();
+  const yr=today.getFullYear();
+  const curMonth=yr===2026?(today.getMonth()+1):(yr<2026?0:12);
+  const ytdLabel=curMonth>0?('1~'+curMonth+'월'):'-';
+  const todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+
+  // 부제 업데이트
+  const subEl=document.getElementById('analytics-sub');
+  if(subEl)subEl.textContent='기준일: '+todayStr+' · 26년 '+ytdLabel+' vs 25년 동기간 (구글시트 라이브)';
+
+  // === 카드 ===
+  let cardsHtml='';
+  TARGETS.forEach(t=>{
+    const b25=base25[t];
+    const sum25_ytd=curMonth>0?b25.slice(0,curMonth).reduce((a,b)=>a+b,0):0;
+    const sum25_year=b25.reduce((a,b)=>a+b,0);
+    const sum26=cur26[t].slice(0,curMonth>0?curMonth:12).reduce((a,b)=>a+b,0);
+    const diff=sum26-sum25_ytd;
+    const cls=diff>0?'up':(diff<0?'dn':'flat');
+    const arrow=diff>0?'▲':(diff<0?'▼':'–');
+    const rateStr=sum25_ytd===0?(sum26>0?'신규':'-'):(diff>=0?'+':'')+(diff/sum25_ytd*100).toFixed(1)+'%';
+    const diffStr=(diff>=0?'+':'')+diff;
+    cardsHtml+='<div class="acard">'+
+      '<div class="acard-co"><span class="acard-co-dot" style="background:'+CO_COLORS[t]+'"></span>'+t+'</div>'+
+      '<div class="acard-num">'+sum26+'</div>'+
+      '<div class="acard-prev">25년 동기 ('+ytdLabel+'): '+sum25_ytd+'</div>'+
+      '<div class="acard-yoy '+cls+'">'+arrow+' '+diffStr+' ('+rateStr+')</div>'+
+      '<div class="acard-ref">25년 연간 (1~12월): '+sum25_year+'</div>'+
+      '</div>';
+  });
+  document.getElementById('aCards').innerHTML=cardsHtml;
+
+  // === Overview ===
+  const ov=data.overview;
+  const pourSum=ov.POUR+ov.다특허+ov['다특허(PD)'];
+  let ovHtml='<table class="atbl">'+
+    '<thead><tr>'+
+    '<th style="background:#fff8e8">전체</th>'+
+    '<th style="background:#fff3e8;color:var(--orange)">POUR 계열</th>'+
+    '<th>POUR</th><th>다특허</th><th>다특허(PD)</th>'+
+    '<th style="background:#e8f7ef;color:var(--green)">DO공법</th>'+
+    '<th style="background:#fceaea;color:var(--red)">CNC공법</th>'+
+    '<th>타사</th><th>일반</th>'+
+    '</tr></thead><tbody><tr>'+
+    '<td style="background:#fff8e8;font-weight:700;font-size:13px">'+ov.전체+'</td>'+
+    '<td style="background:#fff3e8;color:var(--orange);font-weight:700;font-size:13px">'+pourSum+'</td>'+
+    '<td>'+ov.POUR+'</td>'+
+    '<td>'+ov.다특허+'</td>'+
+    '<td>'+ov['다특허(PD)']+'</td>'+
+    '<td style="background:#e8f7ef;color:var(--green);font-weight:700">'+ov.DO+'</td>'+
+    '<td style="background:#fceaea;color:var(--red);font-weight:700">'+ov.CNC+'</td>'+
+    '<td>'+ov.타사+'</td>'+
+    '<td>'+ov.일반+'</td>'+
+    '</tr></tbody></table>';
+  document.getElementById('aOverview').innerHTML=ovHtml;
+
+  // === 월별 추이 (12개월) ===
+  const MONTHS=[1,2,3,4,5,6,7,8,9,10,11,12];
+  let mHtml='<table class="atbl"><thead><tr>'+
+    '<th>업체</th><th>연도</th>'+
+    MONTHS.map(m=>'<th>'+m+'월'+(m===curMonth?' <span style="color:var(--orange);font-size:8px">진행</span>':'')+'</th>').join('')+
+    '<th>합계</th></tr></thead><tbody>';
+  TARGETS.forEach(t=>{
+    const m25=base25[t],m26=cur26[t];
+    const s25=m25.reduce((a,b)=>a+b,0);
+    const s26=m26.slice(0,curMonth>0?curMonth:12).reduce((a,b)=>a+b,0);
+    mHtml+='<tr>'+
+      '<td class="co" rowspan="2">'+t+'</td>'+
+      '<td class="yr25">25년</td>'+
+      MONTHS.map(m=>{const v=m25[m-1];return '<td class="'+(v?'':'zero')+'">'+(v||'-')+'</td>';}).join('')+
+      '<td class="sum">'+s25+'</td>'+
+      '</tr><tr>'+
+      '<td class="yr26">26년</td>'+
+      MONTHS.map(m=>{
+        if(curMonth>0&&m>curMonth)return '<td class="future">·</td>';
+        const v=m26[m-1];
+        return '<td class="'+(v?'':'zero')+'">'+(v||'-')+'</td>';
+      }).join('')+
+      '<td class="sum">'+s26+'</td>'+
+      '</tr>';
+  });
+  mHtml+='</tbody></table>';
+  document.getElementById('aMonthly').innerHTML=mHtml;
+
+  // === 공종별 분포 (25년 동기간 vs 26년 YTD) ===
+  const dist25 = get25CumulativeDist(curMonth>0?curMonth:12);
+  let gHtml='<table class="atbl"><thead><tr>'+
+    '<th>업체</th><th>연도</th>'+
+    공종_COLS.map(c=>'<th>'+c+'</th>').join('')+
+    '<th>합계</th></tr></thead><tbody>';
+  TARGETS.forEach(t=>{
+    const d25=dist25[t],d26=data.공종분포[t];
+    const s25=공종_COLS.reduce((a,c)=>a+d25[c],0),s26=공종_COLS.reduce((a,c)=>a+d26[c],0);
+    gHtml+='<tr>'+
+      '<td class="co" rowspan="2">'+t+'</td>'+
+      '<td class="yr25">25년 동기</td>'+
+      공종_COLS.map(c=>'<td class="'+(d25[c]?'':'zero')+'">'+(d25[c]||'-')+'</td>').join('')+
+      '<td class="sum">'+s25+'</td>'+
+      '</tr><tr>'+
+      '<td class="yr26">26년 YTD</td>'+
+      공종_COLS.map(c=>{const v=d26[c];const dif=v-d25[c];let mark='';if(dif>0)mark=' <span class="aplus">↑</span>';else if(dif<0)mark=' <span class="aminus">↓</span>';return '<td class="'+(v?'':'zero')+'">'+(v||'-')+mark+'</td>';}).join('')+
+      '<td class="sum">'+s26+'</td>'+
+      '</tr>';
+  });
+  gHtml+='</tbody></table>';
+  document.getElementById('aGongDist').innerHTML=gHtml;
+
+  // === 월별 격차 (12개월, 26년 - 25년) ===
+  let xHtml='<table class="atbl"><thead><tr>'+
+    '<th>업체</th>'+
+    MONTHS.map(m=>'<th>'+m+'월</th>').join('')+
+    '<th>누계 (YTD)</th></tr></thead><tbody>';
+  TARGETS.forEach(t=>{
+    const m25=base25[t],m26=cur26[t];
+    const sum25_ytd=curMonth>0?m25.slice(0,curMonth).reduce((a,b)=>a+b,0):0;
+    const sum26_ytd=m26.slice(0,curMonth>0?curMonth:12).reduce((a,b)=>a+b,0);
+    const totalDiff=sum26_ytd-sum25_ytd;
+    xHtml+='<tr><td class="co">'+t+'</td>';
+    for(let i=0;i<12;i++){
+      const m=i+1;
+      if(curMonth>0&&m>curMonth){xHtml+='<td class="future">·</td>';continue;}
+      const d=m26[i]-m25[i];
+      const cls=d>0?'gain':(d<0?'loss':'zero');
+      const txt=d===0?'-':(d>0?'+':'')+d;
+      xHtml+='<td class="'+cls+'">'+txt+'</td>';
+    }
+    const cls=totalDiff>0?'gain':(totalDiff<0?'loss':'zero');
+    const txt=totalDiff===0?'-':(totalDiff>0?'+':'')+totalDiff;
+    xHtml+='<td class="'+cls+'" style="font-weight:700">'+txt+'</td></tr>';
+  });
+  xHtml+='</tbody></table>';
+  document.getElementById('aGap').innerHTML=xHtml;
+}
 
 // ── INIT ──
 async function init(){
