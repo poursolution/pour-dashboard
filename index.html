@@ -394,35 +394,38 @@ table.bid tbody td:last-child{border-right:none}
 .atbl-pivot tr.grand-row td{background:var(--navy);color:#fff;font-weight:700;font-size:11px;padding:8px 4px}
 .atbl-pivot td.grand-lbl{text-align:right;padding-right:8px;letter-spacing:1px}
 /* === SHARE COMBINED (도넛 + 컴팩트 표) === */
-.ashare-combined{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px;padding:14px 18px}
-.ashare-left{display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;border-right:1px dashed var(--line);padding-right:12px}
-.donut-pair{display:flex;gap:24px;justify-content:center;align-items:flex-start}
-.donut-box{display:flex;flex-direction:column;align-items:center;gap:4px}
-.donut-lbl{font-size:11px;font-weight:700;color:var(--navy)}
-.ashare-breakdown{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:center}
-.ashare-chip{padding:4px 9px;border-radius:12px;font-size:10px;font-weight:600;white-space:nowrap}
-.ashare-chip b{font-family:'Bebas Neue',sans-serif;font-size:13px;margin-left:2px}
-.ashare-plus,.ashare-eq{font-size:13px;font-weight:700;color:var(--txt)}
+.ashare-combined{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px;padding:22px 24px;align-items:stretch}
+.ashare-left{display:flex;flex-direction:column;gap:18px;align-items:center;justify-content:center;border-right:1px dashed var(--line);padding-right:18px}
+.donut-pair{display:flex;gap:50px;justify-content:center;align-items:flex-start}
+.donut-box{display:flex;flex-direction:column;align-items:center;gap:8px}
+.donut-lbl{font-size:12px;font-weight:700;color:var(--navy);letter-spacing:0.3px}
+.ashare-breakdown{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;padding-top:6px}
+.ashare-chip{display:inline-flex;align-items:baseline;gap:4px;padding:6px 12px;border-radius:14px;font-size:10.5px;font-weight:600;white-space:nowrap;line-height:1.2}
+.ashare-chip b{font-family:'Bebas Neue',sans-serif;font-size:14px;font-weight:500;letter-spacing:0.5px}
+.ashare-plus,.ashare-eq{font-size:14px;font-weight:600;color:var(--txt);padding:0 2px}
 .ashare-right{display:flex;align-items:center}
 .comp-tbl{width:100%;font-size:11px;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
-.comp-row{display:flex;justify-content:space-between;align-items:center;padding:6px 11px;border-bottom:1px solid var(--line);background:#fff}
+.comp-row{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;border-bottom:1px solid var(--line);background:#fff}
 .comp-row:last-child{border-bottom:none}
-.comp-row span{color:var(--navy)}
-.comp-row b{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--navy);letter-spacing:0.5px}
-.comp-row.total{background:#fff8e8;font-weight:700}
-.comp-row.total b{font-size:15px;color:var(--orange)}
-.comp-row.pour-main{background:#fff3e8;font-weight:700}
-.comp-row.pour-main b{color:var(--orange);font-size:14px}
-.comp-row.indent{font-size:10px}
-.comp-row.indent span{color:var(--txt);padding-left:4px}
+.comp-row span{color:var(--navy);font-weight:500}
+.comp-row b{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--navy);letter-spacing:0.3px;font-weight:400}
+.comp-row.total{background:#fff8e8}
+.comp-row.total span{font-weight:700}
+.comp-row.total b{font-size:16px;color:var(--orange);font-weight:500}
+.comp-row.pour-main{background:#fff3e8}
+.comp-row.pour-main span{font-weight:700}
+.comp-row.pour-main b{color:var(--orange);font-size:15px;font-weight:500}
+.comp-row.indent{padding:5px 12px;font-size:10.5px}
+.comp-row.indent span{color:var(--txt);padding-left:4px;font-weight:500}
+.comp-row.indent b{font-size:12px}
 .comp-row.other{background:#fafbfc}
-.comp-row.other span{color:var(--txt)}
-.comp-row.other b{font-size:11px;color:var(--txt)}
+.comp-row.other span{color:var(--txt);font-weight:500}
+.comp-row.other b{font-size:12px;color:var(--txt);font-weight:400}
 .comp-divider{height:3px;background:var(--gray)}
-/* === 셀 안 diff 표시 (월별 추이 통합) === */
-.atbl-monthly td{padding:5px 4px}
-.atbl-monthly .cell-val{font-size:11px;line-height:1.1}
-.cell-diff{display:block;font-size:9px;font-weight:600;margin-top:1px;font-family:'Bebas Neue',sans-serif;letter-spacing:0.3px}
+/* === 셀 안 diff 표시 (값 옆 동일 크기 나란히) === */
+.atbl-monthly td{padding:6px 4px}
+.atbl-monthly .cell-val{font-size:11px;font-weight:600;display:inline-block}
+.cell-diff{display:inline-block;font-size:9.5px;font-weight:700;margin-left:3px;font-family:'Bebas Neue',sans-serif;letter-spacing:0.3px}
 .cell-diff.gain{color:var(--green)}
 .cell-diff.loss{color:var(--red)}
 /* === 카드 클릭 === */
@@ -2272,18 +2275,18 @@ function renderAnalytics(){
   const shareInclGen=total>0?(pourSum/total*100):0;
   const shareExclGen=exclGeneral>0?(pourSum/exclGeneral*100):0;
 
-  // SVG 도넛 차트 헬퍼
+  // SVG 도넛 차트 헬퍼 (크기 키움)
   function donutSvg(pct, mainColor, label, sub){
-    const r=42, sw=14, cx=60, cy=60;
+    const r=58, sw=18, cx=80, cy=80;
     const C=2*Math.PI*r;
     const filled=Math.min(pct,100)/100*C;
-    return '<svg width="120" height="120" viewBox="0 0 120 120">'+
+    return '<svg width="160" height="160" viewBox="0 0 160 160">'+
       '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#f1f3f5" stroke-width="'+sw+'"/>'+
       '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+mainColor+'" stroke-width="'+sw+'" '+
         'stroke-dasharray="'+filled+' '+C+'" stroke-dashoffset="0" '+
         'transform="rotate(-90 '+cx+' '+cy+')" stroke-linecap="round"/>'+
-      '<text x="'+cx+'" y="'+(cy-3)+'" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="22" font-weight="700" fill="#1A3B5D">'+pct.toFixed(1)+'%</text>'+
-      '<text x="'+cx+'" y="'+(cy+14)+'" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="9" fill="#5d6b7a">'+sub+'</text>'+
+      '<text x="'+cx+'" y="'+(cy-2)+'" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="32" font-weight="600" fill="#1A3B5D">'+pct.toFixed(1)+'%</text>'+
+      '<text x="'+cx+'" y="'+(cy+18)+'" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="11" fill="#5d6b7a">'+sub+'</text>'+
       '</svg>'+
       '<div class="donut-lbl">'+label+'</div>';
   }
@@ -2296,7 +2299,7 @@ function renderAnalytics(){
     '<div class="ashare-breakdown">'+
       '<div class="ashare-chip" style="background:#fff3e8;color:var(--orange)">POUR 단독 <b>'+ov.POUR+'</b></div>'+
       '<div class="ashare-plus">+</div>'+
-      '<div class="ashare-chip" style="background:#fff8e8;color:#d97706">다특허(PD) <b>'+ov['다특허(PD)']+'</b></div>'+
+      '<div class="ashare-chip" style="background:#fff8e8;color:#b45309">다특허(PD) <b>'+ov['다특허(PD)']+'</b></div>'+
       '<div class="ashare-eq">=</div>'+
       '<div class="ashare-chip" style="background:var(--orange);color:#fff">POUR 계열 <b>'+pourSum+'</b></div>'+
     '</div>'+
@@ -2341,14 +2344,15 @@ function renderAnalytics(){
       MONTHS.map(m=>{
         if(curMonth>0&&m>curMonth)return '<td class="future">·</td>';
         const v26=m26[m-1];const v25=m25[m-1];const d=v26-v25;
+        const valTxt=v26||'-';
         let diffSpan='';
         if(d!==0){
           const cls=d>0?'gain':'loss';
-          diffSpan='<span class="cell-diff '+cls+'">'+(d>0?'+':'')+d+'</span>';
+          diffSpan=' <span class="cell-diff '+cls+'">'+(d>0?'+':'')+d+'</span>';
         }
-        return '<td class="'+(v26?'':'zero')+'"><div class="cell-val">'+(v26||'-')+'</div>'+diffSpan+'</td>';
+        return '<td class="'+(v26?'':'zero')+'"><span class="cell-val">'+valTxt+'</span>'+diffSpan+'</td>';
       }).join('')+
-      '<td class="sum">'+s26+(totalDiff!==0?'<span class="cell-diff '+(totalDiff>0?'gain':'loss')+'">'+(totalDiff>0?'+':'')+totalDiff+'</span>':'')+'</td>'+
+      '<td class="sum">'+s26+(totalDiff!==0?' <span class="cell-diff '+(totalDiff>0?'gain':'loss')+'">'+(totalDiff>0?'+':'')+totalDiff+'</span>':'')+'</td>'+
       '</tr>';
   });
   mHtml+='</tbody></table>';
@@ -2433,26 +2437,34 @@ function openCoDetail(co){
   const curMonth=yr===2026?(today.getMonth()+1):(yr<2026?0:12);
   const ytdLabel=curMonth>0?('1~'+curMonth+'월'):'-';
 
-  // 해당 업체 26년 공고 추출
-  const bids=[];
+  // 해당 업체 26년 공고 추출 (단지+공고일 기준 dedup → 카드 수치와 일치)
+  const bidsGroup=new Map();
   allBidsData.forEach(row=>{
     if(!row.공고일)return;
     const d=new Date(row.공고일);
     if(isNaN(d.getTime())||d.getFullYear()!==2026)return;
     const matchedCo=aLookup(row.특허번호);
     if(matchedCo!==co)return;
-    // 공종 추출 (모든 공종 컬럼 결합)
-    const scopes=[];
+    const key=row.단지명+'|'+row.공고일;
+    if(!bidsGroup.has(key)){
+      bidsGroup.set(key,{
+        공고일:row.공고일,구분:row.구분,단지명:row.단지명,
+        특허번호Set:new Set(),공종Set:new Set(),month:d.getMonth()+1
+      });
+    }
+    const e=bidsGroup.get(key);
+    if(row.특허번호)e.특허번호Set.add(row.특허번호);
     공종_COLS.forEach(gc=>{
       const v=row[gc];
-      if(v&&v.trim()){v.split('\n').forEach(s=>{s=s.trim();if(s)scopes.push(gc+'/'+s);});}
-    });
-    bids.push({
-      공고일:row.공고일,구분:row.구분,단지명:row.단지명,
-      특허번호:row.특허번호,공종표시:scopes.join(', ')||'-',
-      month:d.getMonth()+1
+      if(v&&v.trim()){v.split('\n').forEach(s=>{s=s.trim();if(s)e.공종Set.add(gc+'/'+s);});}
     });
   });
+  const bids=Array.from(bidsGroup.values()).map(e=>({
+    공고일:e.공고일,구분:e.구분,단지명:e.단지명,
+    특허번호:Array.from(e.특허번호Set).join(', '),
+    공종표시:Array.from(e.공종Set).join(', ')||'-',
+    month:e.month
+  }));
   bids.sort((a,b)=>b.공고일.localeCompare(a.공고일)); // 최신순
 
   // 월별 카운트 (공고문 단위 + 공종별)
@@ -2527,7 +2539,7 @@ function openCoDetail(co){
   body+='</tbody></table>';
 
   // 공고 목록
-  body+='<div class="modal-section-h">공고 목록 ('+bids.length+'건)</div>';
+  body+='<div class="modal-section-h">공고 목록 — '+bids.length+'건 <span style="font-size:9px;color:var(--txt2);font-weight:500">(단지+공고일 기준, 카드 수치와 일치)</span></div>';
   if(bids.length===0){
     body+='<div class="modal-empty">해당 업체의 26년 공고 데이터가 없습니다.</div>';
   }else{
