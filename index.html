@@ -330,16 +330,27 @@ table.bid tbody td:last-child{border-right:none}
 .toast.ok{border-left:4px solid var(--green)}.toast.err{border-left:4px solid var(--red)}
 /* Mobile */
 @media(max-width:768px){
-  .hdr{padding:0 12px;height:48px}.hdr-title{font-size:12px}.hdr-sub{display:none}
+  /* 헤더 - 자동 높이 + 자동 줄바꿈 */
+  .hdr{padding:6px 10px;height:auto;min-height:48px;flex-wrap:wrap;gap:6px;align-items:center}
+  .logo-row{gap:8px;flex:1 1 auto}
+  .hdr-title{font-size:12px}.hdr-sub{display:none}
+  .hdr-right{gap:4px;flex-wrap:wrap;justify-content:flex-end;flex:1 1 100%}
+  .hbtn{font-size:9.5px;padding:5px 8px;white-space:nowrap;gap:2px;flex-shrink:0}
+  .hbtn.sm{font-size:9.5px;padding:4px 7px;flex-shrink:0}
+  .dbadge{font-size:9.5px!important;padding:3px 8px!important;flex-shrink:0;white-space:nowrap}
+  
+  /* 탭 */
   .tabs{padding:0 8px;overflow-x:auto}.tab{font-size:10px;padding:10px 10px;white-space:nowrap}
   .fbar{padding:6px 10px;gap:4px;flex-wrap:wrap}.fchip{font-size:9px;padding:2px 7px}
   .board-area,.tbl-area{padding:0 8px 12px}
-  /* 공고문 대시보드: 가로 스크롤 강제 (overflow:hidden 해제) */
+  
+  /* 공고문 대시보드: 표 가시성 확보 (flex 0으로 자동 높이) */
   .bid-wrap{overflow:visible}
-  .bid-grid{padding:0 8px 12px;gap:8px}
-  .bid-grid > .bid-scroll{overflow-x:auto!important;border-radius:6px;-webkit-overflow-scrolling:touch}
+  .bid-grid{padding:0 8px 12px;gap:8px;flex-direction:column!important}
+  .bid-grid > .bid-scroll{flex:0 0 auto!important;height:auto!important;overflow-x:auto!important;overflow-y:visible!important;border-radius:6px;-webkit-overflow-scrolling:touch;width:100%;display:block}
+  
   /* 표는 축소된 폰트로, 컬럼 너비도 함께 축소 */
-  table.bid{font-size:8px}
+  table.bid{font-size:8px;table-layout:auto!important}
   table.bid thead tr.bh1 th{font-size:9px;letter-spacing:1px;padding:5px 2px}
   table.bid thead tr.bh2 th{font-size:7px;padding:4px 2px}
   table.bid tbody td{padding:4px 2px}
@@ -349,12 +360,12 @@ table.bid tbody td:last-child{border-right:none}
   table.bid colgroup col:nth-child(7){width:46px!important}table.bid colgroup col:nth-child(8){width:46px!important}
   table.bid colgroup col:nth-child(9){width:46px!important}
   .bid-nm{font-size:8px;font-weight:700;line-height:1.2}.bid-gong{font-size:7px}.bid-patent-txt{font-size:6px}.bid-dc{font-size:7px}
+  
   /* 공고문 헤더 (제목 + 버튼들) */
   .ds{padding:0 8px}.bh{padding:8px 0 6px;flex-wrap:wrap;gap:6px}
   .bh-title{font-size:14px;letter-spacing:3px}
   .bh-sub{font-size:10px}
   .abtn,.ebtn{font-size:10px;padding:6px 10px}
-  /* 브랜드 selector 등 */
   .bf-sel{font-size:9px;padding:3px 6px}
   .srch-wrap{width:100%;margin-top:2px}
   .srch{font-size:10px;padding:5px 8px 5px 24px;width:100%}
@@ -587,11 +598,11 @@ table.bid tbody td:last-child{border-right:none}
   .bid-tag{font-size:8px;padding:1px 4px}
 }
 
-/* 더 작은 화면 (400px 이하) */
-@media(max-width:400px){
+/* 더 작은 화면 (340px 이하 - iPhone SE 등) */
+@media(max-width:340px){
   .acards{grid-template-columns:1fr!important}
   .donut-pair{gap:12px}
-  .donut-box svg{width:115px!important;height:115px!important}
+  .donut-box svg{width:110px!important;height:110px!important}
   .ashare-breakdown{gap:4px}
   .ashare-chip{font-size:9.5px;padding:3px 7px}
   .ms-gong{grid-template-columns:repeat(2,1fr)}
