@@ -332,8 +332,13 @@ table.bid tbody td:last-child{border-right:none}
 @media(max-width:768px){
   .hdr{padding:0 12px;height:48px}.hdr-title{font-size:12px}.hdr-sub{display:none}
   .tabs{padding:0 8px;overflow-x:auto}.tab{font-size:10px;padding:10px 10px;white-space:nowrap}
-  .fbar{padding:6px 10px;gap:4px}.fchip{font-size:9px;padding:2px 7px}
+  .fbar{padding:6px 10px;gap:4px;flex-wrap:wrap}.fchip{font-size:9px;padding:2px 7px}
   .board-area,.tbl-area{padding:0 8px 12px}
+  /* 공고문 대시보드: 가로 스크롤 강제 (overflow:hidden 해제) */
+  .bid-wrap{overflow:visible}
+  .bid-grid{padding:0 8px 12px;gap:8px}
+  .bid-grid > .bid-scroll{overflow-x:auto!important;border-radius:6px;-webkit-overflow-scrolling:touch}
+  /* 표는 축소된 폰트로, 컬럼 너비도 함께 축소 */
   table.bid{font-size:8px}
   table.bid thead tr.bh1 th{font-size:9px;letter-spacing:1px;padding:5px 2px}
   table.bid thead tr.bh2 th{font-size:7px;padding:4px 2px}
@@ -342,8 +347,18 @@ table.bid tbody td:last-child{border-right:none}
   table.bid colgroup col:nth-child(3){width:36px!important}table.bid colgroup col:nth-child(4){width:85px!important}
   table.bid colgroup col:nth-child(5){width:55px!important}table.bid colgroup col:nth-child(6){width:52px!important}
   table.bid colgroup col:nth-child(7){width:46px!important}table.bid colgroup col:nth-child(8){width:46px!important}
+  table.bid colgroup col:nth-child(9){width:46px!important}
   .bid-nm{font-size:8px;font-weight:700;line-height:1.2}.bid-gong{font-size:7px}.bid-patent-txt{font-size:6px}.bid-dc{font-size:7px}
-  .ds{padding:0}.bh{padding:8px 0 6px}.g2{grid-template-columns:1fr}
+  /* 공고문 헤더 (제목 + 버튼들) */
+  .ds{padding:0 8px}.bh{padding:8px 0 6px;flex-wrap:wrap;gap:6px}
+  .bh-title{font-size:14px;letter-spacing:3px}
+  .bh-sub{font-size:10px}
+  .abtn,.ebtn{font-size:10px;padding:6px 10px}
+  /* 브랜드 selector 등 */
+  .bf-sel{font-size:9px;padding:3px 6px}
+  .srch-wrap{width:100%;margin-top:2px}
+  .srch{font-size:10px;padding:5px 8px 5px 24px;width:100%}
+  .g2{grid-template-columns:1fr}
   .dtabs{padding:0 8px}.dtab{font-size:10px;padding:8px 8px}
 }
 .hidden{display:none!important}
