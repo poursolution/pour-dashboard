@@ -1770,7 +1770,7 @@ function exportExcel(){
   if(!window.XLSX){alert('XLSX 라이브러리 로드 중...');return;}
   const rows=sites.map((s,i)=>({'NO':i+1,'현장명':s.name,'유형':s.type,'공종':s.gong||'','물량':s.volume||'','현장소장':s.manager||'','착공일':s.startdate||'','자재출고':s.matdate||'','예정일':s.expected||'','진행단계':STAGE_LABEL[s.stage]||s.stage||'','메모':s.note||'','낙찰업체':(s.bid||{}).winner||'','낙찰금액':(s.bid||{}).amount||'','지역':(s.bid||{}).region||'','세대수':(s.bid||{}).units||'','계약금액':((s.pay||{}).contractAmount)||'','📌입찰완료':(s.tabStatus||{}).bid?'Y':'','📋착공준비완료':(s.tabStatus||{}).prep?'Y':'','🏗시공완료':(s.tabStatus||{}).const?'Y':'','💰대금완료':(s.tabStatus||{}).pay?'Y':'','📄서류준공완료':(s.tabStatus||{}).docs?'Y':'','🔧하자완료':(s.tabStatus||{}).defect?'Y':''}));
   const ws=XLSX.utils.json_to_sheet(rows);
-  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,'현장목록',ws);
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'현장목록');
   XLSX.writeFile(wb,'POUR_현장목록_'+new Date().toISOString().split('T')[0]+'.xlsx');
   showToast('엑셀 파일 다운로드됨','ok');
 }
@@ -2772,7 +2772,7 @@ function exportAnalyticsExcel(){
     ];
     const ws1=XLSX.utils.aoa_to_sheet(s1);
     ws1['!cols']=[{wch:28},{wch:14},{wch:14},{wch:14}];
-    XLSX.utils.book_append_sheet(wb,'1. 점유율',ws1);
+    XLSX.utils.book_append_sheet(wb,ws1,'1. 점유율');
     console.log('[Export] Sheet 1 완료');
 
     // ═══ Sheet 2: 업체별 누계 비교 ═══
@@ -2796,7 +2796,7 @@ function exportAnalyticsExcel(){
     });
     const ws2=XLSX.utils.aoa_to_sheet(s2);
     ws2['!cols']=[{wch:16},{wch:16},{wch:16},{wch:12},{wch:16},{wch:16},{wch:12},{wch:18}];
-    XLSX.utils.book_append_sheet(wb,'2. 업체별 누계 비교',ws2);
+    XLSX.utils.book_append_sheet(wb,ws2,'2. 업체별 누계 비교');
     console.log('[Export] Sheet 2 완료');
 
     // ═══ Sheet 3: 월별 추이 ═══
@@ -2830,7 +2830,7 @@ function exportAnalyticsExcel(){
     });
     const ws3=XLSX.utils.aoa_to_sheet(s3);
     ws3['!cols']=[{wch:14},{wch:11},...Array(12).fill({wch:7}),{wch:9}];
-    XLSX.utils.book_append_sheet(wb,'3. 월별 추이',ws3);
+    XLSX.utils.book_append_sheet(wb,ws3,'3. 월별 추이');
     console.log('[Export] Sheet 3 완료');
 
     // ═══ Sheet 4: 26년 공종별 특허 현황 (피벗) ═══
@@ -2869,7 +2869,7 @@ function exportAnalyticsExcel(){
     s4.push(['총합계','',...TARGETS.map(t=>grandTotals[t]),grandSum]);
     const ws4=XLSX.utils.aoa_to_sheet(s4);
     ws4['!cols']=[{wch:10},{wch:14},...TARGETS.map(t=>({wch:Math.max(10,t.length+3)})),{wch:10}];
-    XLSX.utils.book_append_sheet(wb,'4. 공종별 특허 현황',ws4);
+    XLSX.utils.book_append_sheet(wb,ws4,'4. 공종별 특허 현황');
     console.log('[Export] Sheet 4 완료');
 
     // ═══ Sheet 5: 공종별 분포 (대분류, 25년 동기 vs 26년 YTD) ═══
@@ -2890,7 +2890,7 @@ function exportAnalyticsExcel(){
     });
     const ws5=XLSX.utils.aoa_to_sheet(s5);
     ws5['!cols']=[{wch:14},{wch:12},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10}];
-    XLSX.utils.book_append_sheet(wb,'5. 공종별 분포',ws5);
+    XLSX.utils.book_append_sheet(wb,ws5,'5. 공종별 분포');
     console.log('[Export] Sheet 5 완료');
 
     // ═══ 다운로드 (Blob + 링크 방식으로 호환성 확보) ═══
