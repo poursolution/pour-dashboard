@@ -349,17 +349,25 @@ table.bid tbody td:last-child{border-right:none}
   .bid-grid{padding:0 8px 12px;gap:8px;flex-direction:column!important}
   .bid-grid > .bid-scroll{flex:0 0 auto!important;height:auto!important;overflow-x:auto!important;overflow-y:visible!important;border-radius:6px;-webkit-overflow-scrolling:touch;width:100%;display:block}
   
-  /* 표는 축소된 폰트로, 컬럼 너비도 함께 축소 */
-  table.bid{font-size:8px;table-layout:auto!important}
-  table.bid thead tr.bh1 th{font-size:9px;letter-spacing:1px;padding:5px 2px}
-  table.bid thead tr.bh2 th{font-size:7px;padding:4px 2px}
-  table.bid tbody td{padding:4px 2px}
-  table.bid colgroup col:nth-child(1){width:34px!important}table.bid colgroup col:nth-child(2){width:30px!important}
-  table.bid colgroup col:nth-child(3){width:36px!important}table.bid colgroup col:nth-child(4){width:85px!important}
-  table.bid colgroup col:nth-child(5){width:55px!important}table.bid colgroup col:nth-child(6){width:52px!important}
-  table.bid colgroup col:nth-child(7){width:46px!important}table.bid colgroup col:nth-child(8){width:46px!important}
-  table.bid colgroup col:nth-child(9){width:46px!important}
-  .bid-nm{font-size:8px;font-weight:700;line-height:1.2}.bid-gong{font-size:7px}.bid-patent-txt{font-size:6px}.bid-dc{font-size:7px}
+  /* 표는 축소된 폰트로, 컬럼 너비도 함께 축소 (하지만 wrap 방지) */
+  table.bid{font-size:9px;table-layout:fixed!important;min-width:600px}
+  table.bid thead tr.bh1 th{font-size:10px;letter-spacing:1px;padding:5px 2px}
+  table.bid thead tr.bh2 th{font-size:9px;padding:4px 3px;white-space:nowrap}
+  table.bid tbody td{padding:5px 3px;white-space:nowrap}
+  table.bid colgroup col:nth-child(1){width:46px!important}
+  table.bid colgroup col:nth-child(2){width:44px!important}
+  table.bid colgroup col:nth-child(3){width:52px!important}
+  table.bid colgroup col:nth-child(4){width:110px!important;white-space:normal!important}
+  table.bid colgroup col:nth-child(5){width:60px!important}
+  table.bid colgroup col:nth-child(6){width:80px!important}
+  table.bid colgroup col:nth-child(7){width:62px!important}
+  table.bid colgroup col:nth-child(8){width:55px!important}
+  table.bid colgroup col:nth-child(9){width:62px!important}
+  table.bid td:nth-child(4){white-space:normal!important;word-break:keep-all;line-height:1.3}
+  .bid-nm{font-size:9px;font-weight:700;line-height:1.3;white-space:normal;word-break:keep-all}
+  .bid-gong{font-size:8px;white-space:nowrap}
+  .bid-patent-txt{font-size:8px;white-space:nowrap;font-family:'Bebas Neue',sans-serif;letter-spacing:0.3px}
+  .bid-dc{font-size:8px;white-space:nowrap}
   
   /* 공고문 헤더 (제목 + 버튼들) */
   .ds{padding:0 8px}.bh{padding:8px 0 6px;flex-wrap:wrap;gap:6px}
@@ -811,8 +819,9 @@ table.bid tbody td:last-child{border-right:none}
     <div class="fdiv"></div>
     <span class="flbl">기간</span>
     <span style="font-size:10px;color:var(--txt);font-weight:600">2026년 1월 ~ 6월 (25년 동기 대비)</span>
-    <div style="margin-left:auto;display:flex;gap:7px;align-items:center">
+    <div style="margin-left:auto;display:flex;gap:7px;align-items:center;flex-wrap:wrap">
       <span id="aStatus" style="font-size:10px;color:var(--txt)"></span>
+      <button class="hbtn green sm" onclick="exportAnalyticsExcel()">📥 엑셀 내보내기</button>
       <button class="hbtn sm" onclick="loadAllBidsData()">🔄 새로고침</button>
     </div>
   </div>
@@ -2706,6 +2715,171 @@ function openCoDetail(co){
 function closeCoDetail(e){
   if(e&&e.target&&e.target.id!=='aCoModal'&&!e.target.closest('.amodal-x'))return;
   document.getElementById('aCoModal').classList.add('hidden');
+}
+
+// === 데이터 분석 → 엑셀 내보내기 ===
+function exportAnalyticsExcel(){
+  if(!window.XLSX){alert('XLSX 라이브러리 로드 중입니다. 잠시 후 다시 시도해주세요.');return;}
+  if(!aLoaded||!allBidsData){alert('데이터 분석 탭을 먼저 로드해주세요.');return;}
+
+  const data=compute26();
+  const today=new Date();
+  const yr=today.getFullYear();
+  const curMonth=yr===2026?(today.getMonth()+1):(yr<2026?0:12);
+  const ytdLabel=curMonth>0?('1~'+curMonth+'월'):'-';
+  const todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+
+  const wb=XLSX.utils.book_new();
+  const MONTH_HDR=[1,2,3,4,5,6,7,8,9,10,11,12].map(m=>m+'월');
+
+  // ═══ Sheet 1: 점유율 ═══
+  const ov=data.overview;
+  const pourSum=ov.POUR+ov['다특허(PD)'];
+  const total=ov.전체;
+  const exclGeneral=total-ov.일반;
+  const shareInclGen=total>0?(pourSum/total*100):0;
+  const shareExclGen=exclGeneral>0?(pourSum/exclGeneral*100):0;
+  const s1=[
+    ['POUR 점유율 및 26년 전체 공고 현황','','',''],
+    ['기준일: '+todayStr+' ('+ytdLabel+' 누적)','','',''],
+    [],
+    ['[점유율]','','',''],
+    ['기준','POUR 계열','비율 분모','점유율(%)'],
+    ['일반 제외 기준',pourSum,exclGeneral,parseFloat(shareExclGen.toFixed(2))],
+    ['일반 포함 기준',pourSum,total,parseFloat(shareInclGen.toFixed(2))],
+    [],
+    ['[전체 공고 현황 (구분별)]','',''],
+    ['구분','건수',''],
+    ['전체',total,''],
+    ['POUR 계열 (단독+다특허PD)',pourSum,''],
+    ['  · POUR 단독',ov.POUR,''],
+    ['  · 다특허(PD)',ov['다특허(PD)'],''],
+    ['DO공법',ov.DO,''],
+    ['CNC공법',ov.CNC,''],
+    ['다특허(타사만)',ov.다특허,''],
+    ['타사',ov.타사,''],
+    ['일반',ov.일반,''],
+  ];
+  const ws1=XLSX.utils.aoa_to_sheet(s1);
+  ws1['!cols']=[{wch:28},{wch:14},{wch:14},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,'1. 점유율',ws1);
+
+  // ═══ Sheet 2: 업체별 누계 비교 ═══
+  const cur26_공고=data.공고;
+  const cur26_공종=data.공종;
+  const s2=[
+    ['업체별 누계 비교','','','','','','',''],
+    ['기준일: '+todayStr+' · 26년 '+ytdLabel+' vs 25년 동기','','','','','','',''],
+    [],
+    ['업체','26년 YTD (공고문)','25년 동기 (공고문)','증감(공고문)','26년 YTD (공종별)','25년 동기 (공종별)','증감(공종별)','25년 연간 (공고문 참고)'],
+  ];
+  TARGETS.forEach(t=>{
+    const b25공고=BASE_25_공고[t],b25공종=BASE_25_공종[t];
+    const s25_공고_ytd=curMonth>0?b25공고.slice(0,curMonth).reduce((a,b)=>a+b,0):0;
+    const s25_공종_ytd=curMonth>0?b25공종.slice(0,curMonth).reduce((a,b)=>a+b,0):0;
+    const s25_공고_yr=b25공고.reduce((a,b)=>a+b,0);
+    const s26_공고=cur26_공고[t].slice(0,curMonth>0?curMonth:12).reduce((a,b)=>a+b,0);
+    const s26_공종=cur26_공종[t].slice(0,curMonth>0?curMonth:12).reduce((a,b)=>a+b,0);
+    s2.push([t,s26_공고,s25_공고_ytd,s26_공고-s25_공고_ytd,s26_공종,s25_공종_ytd,s26_공종-s25_공종_ytd,s25_공고_yr]);
+  });
+  const ws2=XLSX.utils.aoa_to_sheet(s2);
+  ws2['!cols']=[{wch:16},{wch:16},{wch:16},{wch:12},{wch:16},{wch:16},{wch:12},{wch:18}];
+  XLSX.utils.book_append_sheet(wb,'2. 업체별 누계 비교',ws2);
+
+  // ═══ Sheet 3: 월별 추이 ═══
+  const s3=[
+    ['월별 추이 (25년 vs 26년, 방식 1: 공고문 단위)','','','','','','','','','','','','','',''],
+    [],
+    ['업체','연도','1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월','합계'],
+  ];
+  TARGETS.forEach(t=>{
+    const m25=BASE_25_공고[t],m26=cur26_공고[t];
+    s3.push([t,'25년',...m25,m25.reduce((a,b)=>a+b,0)]);
+    const m26FilledOr=(i)=>(curMonth>0&&(i+1)>curMonth)?'':m26[i];
+    s3.push(['','26년',...MONTH_HDR.map((_,i)=>m26FilledOr(i)),m26.slice(0,curMonth>0?curMonth:12).reduce((a,b)=>a+b,0)]);
+    s3.push(['','격차(26-25)',...MONTH_HDR.map((_,i)=>{
+      if(curMonth>0&&(i+1)>curMonth)return '';
+      return m26[i]-m25[i];
+    }),m26.slice(0,curMonth>0?curMonth:12).reduce((a,b)=>a+b,0)-(curMonth>0?m25.slice(0,curMonth).reduce((a,b)=>a+b,0):0)]);
+  });
+  s3.push([]);
+  s3.push(['월별 추이 (방식 2: 공종별)','','','','','','','','','','','','','','']);
+  s3.push(['업체','연도','1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월','합계']);
+  TARGETS.forEach(t=>{
+    const m25=BASE_25_공종[t],m26=cur26_공종[t];
+    s3.push([t,'25년',...m25,m25.reduce((a,b)=>a+b,0)]);
+    const m26FilledOr=(i)=>(curMonth>0&&(i+1)>curMonth)?'':m26[i];
+    s3.push(['','26년',...MONTH_HDR.map((_,i)=>m26FilledOr(i)),m26.slice(0,curMonth>0?curMonth:12).reduce((a,b)=>a+b,0)]);
+    s3.push(['','격차(26-25)',...MONTH_HDR.map((_,i)=>{
+      if(curMonth>0&&(i+1)>curMonth)return '';
+      return m26[i]-m25[i];
+    }),m26.slice(0,curMonth>0?curMonth:12).reduce((a,b)=>a+b,0)-(curMonth>0?m25.slice(0,curMonth).reduce((a,b)=>a+b,0):0)]);
+  });
+  const ws3=XLSX.utils.aoa_to_sheet(s3);
+  ws3['!cols']=[{wch:14},{wch:11},...Array(12).fill({wch:7}),{wch:9}];
+  XLSX.utils.book_append_sheet(wb,'3. 월별 추이',ws3);
+
+  // ═══ Sheet 4: 26년 공종별 특허 현황 (피벗) ═══
+  const s4=[
+    ['26년 공종별 특허 현황 (피벗, '+ytdLabel+')'],
+    [],
+    ['공종','소분류',...TARGETS,'총합계'],
+  ];
+  const 공종_GROUPS={};
+  PIVOT_ROWS.forEach(pr=>{
+    if(!공종_GROUPS[pr.공종])공종_GROUPS[pr.공종]=[];
+    공종_GROUPS[pr.공종].push(pr);
+  });
+  const sortedGroups=Object.keys(공종_GROUPS).sort();
+  const grandTotals={};TARGETS.forEach(t=>grandTotals[t]=0);
+  let grandSum=0;
+  sortedGroups.forEach(gc=>{
+    const rows=공종_GROUPS[gc];
+    const groupTotals={};TARGETS.forEach(t=>groupTotals[t]=0);
+    rows.forEach(pr=>{
+      const pkey=pr.공종+'__'+pr.소분류;
+      let rowSum=0;
+      const row=[pr.공종,pr.소분류];
+      TARGETS.forEach(t=>{
+        const v=data.pivot[t][pkey]||0;
+        row.push(v);
+        groupTotals[t]+=v;grandTotals[t]+=v;rowSum+=v;
+      });
+      row.push(rowSum);
+      s4.push(row);
+      grandSum+=rowSum;
+    });
+    const grpSum=Object.values(groupTotals).reduce((a,b)=>a+b,0);
+    s4.push([gc+' 소계','',...TARGETS.map(t=>groupTotals[t]),grpSum]);
+  });
+  s4.push(['총합계','',...TARGETS.map(t=>grandTotals[t]),grandSum]);
+  const ws4=XLSX.utils.aoa_to_sheet(s4);
+  ws4['!cols']=[{wch:10},{wch:14},...TARGETS.map(t=>({wch:Math.max(10,t.length+3)})),{wch:10}];
+  XLSX.utils.book_append_sheet(wb,'4. 공종별 특허 현황',ws4);
+
+  // ═══ Sheet 5: 공종별 분포 (대분류, 25년 동기 vs 26년 YTD) ═══
+  const dist25=get25CumulativeDist(curMonth>0?curMonth:12);
+  const s5=[
+    ['공종별 분포 (대분류, 25년 동기 vs 26년 YTD)'],
+    [],
+    ['업체','연도','옥상방수','재도장','주차장','도로','기타','합계'],
+  ];
+  TARGETS.forEach(t=>{
+    const d25=dist25[t],d26=data.공종분포[t];
+    const s25=공종_COLS.reduce((a,c)=>a+d25[c],0);
+    const s26=공종_COLS.reduce((a,c)=>a+d26[c],0);
+    s5.push([t,'25년 동기',...공종_COLS.map(c=>d25[c]),s25]);
+    s5.push(['','26년 YTD',...공종_COLS.map(c=>d26[c]),s26]);
+    s5.push(['','증감(26-25)',...공종_COLS.map(c=>d26[c]-d25[c]),s26-s25]);
+  });
+  const ws5=XLSX.utils.aoa_to_sheet(s5);
+  ws5['!cols']=[{wch:14},{wch:12},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10}];
+  XLSX.utils.book_append_sheet(wb,'5. 공종별 분포',ws5);
+
+  // 파일 저장
+  const filename='POUR_데이터분석_'+todayStr+'.xlsx';
+  XLSX.writeFile(wb,filename);
+  showToast('엑셀 파일 다운로드 완료: '+filename,'ok');
 }
 
 // ── INIT ──
